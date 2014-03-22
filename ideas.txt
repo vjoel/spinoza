@@ -1,0 +1,7 @@
+possible approach
+  model
+    TLA+
+
+talk to:
+  R. Escriva
+  
