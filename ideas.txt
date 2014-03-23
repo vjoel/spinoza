@@ -1,7 +1,17 @@
+not prototype, but model
+  prototype would be concurrent/destributed in the normal way
+  model is single process, single thread, with global notion of time
+    but possibly stochastic (or even antagonistic) scheduler
+
 possible approach
   model
     TLA+
+    see newcombe-slides.pdf
+
+not model for verification, but for learning, understanding *intent*, examining obvious corner cases
+  model to answer the question: what is original and interesting about
+  the approach in the paper
 
 talk to:
-  R. Escriva
+  R. Escriva about h-store?
   
