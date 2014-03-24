@@ -15,3 +15,6 @@ not model for verification, but for learning, understanding *intent*, examining 
 talk to:
   R. Escriva about h-store?
   
+
+presentation ideas
+  https://speakerdeck.com/mrb/papers-we-love-a-unified-theory-of-garbage-collection
