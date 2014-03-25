@@ -1,0 +1,146 @@
+
+On Wed, Mar 12, 2014 at 8:45 PM, Joel VanderWerf <joelvanderwerf@gmail.com> wrote:
+
+
+    Alex,
+
+    Well, I got "volunteered" to give a talk about Calvin in a few months to the SF branch of the "Papers We Love" meetup [1]. I can still decline, if you prefer, for any reason.
+
+
+Of course you're welcome to give a talk on Calvin. :)
+ 
+
+
+    These are the papers I've read:
+
+      Modularity and Scalability in Calvin, IEEE 2013
+
+      Calvin: Fast Distributed Transactions for Partitioned Database Systems, SIGMOD 2012
+
+      Consistency Tradeoffs in Modern Distributed Database System Design, Abadi, 2012
+
+    I'll go back and re-read them. These also look useful (but I've only skimmed them):
+
+      The Case for Determinism in Database Systems, VLDB 2010
+
+      Lightweight Locking for Main Memory Database Systems, VLDB, 2012
+
+    Anything else you'd recommend?
+
+
+The System R*, H-Store, and Spanner papers are worth reading for context and to compare/contrast. These (plus Calvin) basically summarize the history of ideas about distributed transactional databases.
+As a general rule, I also recommend the Paxos paper. It's really hard to reach a deep understanding of the distributed database systems design space without thoroughly grokking Paxos.
+
+
+    I do have some specific questions on the IEEE 2013 paper, but I'll save them for another email after I've read (and re-read) some more.
+
+    There's one question that stood out before, and maybe you can point me towards the answer: how can cross-partition transactions work? If a transaction refers to rows in two different partitions, which are not both stored on any one node, how can each node deterministically decide whether the transaction succeeds, without further coordination?
+
+
+When there are no failures, the protocol proceeds roughly as follows at each participating scheduler:
+
+1) Get a transaction request T from log (sequencer).
+2) Request locks on all records that T will access and that are stored locally.
+3) Wait until all lock requests for T have been granted. (Other transactions that have all their locks may execute in the mean time.)
+4) Read the values of all records that are elements of T's read set and that are stored locally.
+5) Broadcast those read results to all other participants.
+6) Collect the results of other participants' read result broadcasts until the values of all records in T's read set are known.
+7) Executed T to completion based on these read results, and commit/abort as dictated by transaction logic. (Any writes to records that are not stored in the local data partition are no-ops.)
+8) Release locks.
+
+Note that all participants see the same inputs for each transaction: the transaction request T was replicated in the log, and all partitions used the same read results when executing it.
+
+In a replicated deployment, each node broadcasts read results (step 5 above) only to other nodes in the same replica. On a failure, other participants will get stuck waiting for read results that the failed node is failing to broadcast. After a specified wait, they contact an equivalent node in a different replica instead, which forwards them its read results (which it remembers, because it just sent it out, and all outgoing message traffic is logged locally).
+
+There are also various other obvious optimizations:
+
+* skip steps 6-7 if no records in T's write set are local (also steps 2, 3, and 8 if the storage engine is multiversioned)
+* skip step 5 if all records in T's write set are local
+* release all read locks immediately after step 4
+* optimize away any code paths in 7 whose only affects are non-local writes (often this results in being able to skip step 6)
+
+
+    Maybe this sentence from the 2012 paper, page 3, is the answer:
+
+        Rather, each node involved in a transaction waits for a one-way
+        message from each node that could potentially deterministically abort
+        the transaction, and only commits once it receives these messages.
+
+
+    Doesn't this start to resemble 2PC? And also expose a vulnerability to network/node failures? (I guess the vulnerability is no worse than anything else, since a node only needs to receive 1 of n messages from n identical replicas.)
+
+
+It resembles 2PC only in that both involve require some messaging between partitions---its purpose and mechanics are different. There is no way to implement a distributed database system without coordination between machines; the best you can do is minimize the coordination and move it out of critical sections when possible.
+
+In Calvin, as long as you can append to the log (sequencer) and there's a scheduler alive for each partition at at least one replica, you can make progress. Note that this actually is worse than in nondeterministic systems, where all replicas of a partition can die and you can still make progress on transactions that don't touch any data on that partition.
+
+
+    Is any of the calvin source code available? Or binaries? If it helps, just having the source relevant to one configuration would be ok, such as: serial scheduler, OCC transactions, and memory store. It would be great (but not necessary) to give a short demo at my talk.
+
+
+It is not currently available. I graduated and am no longer managing the codebase, but I'm told that it will be released open source sometime this spring.
+
+
+    Thanks!
+    Joel
+
+    [1] http://www.meetup.com/papers-we-love-too
+
+    ps. I'm still working on Tupelo, which, AFAICT, shares a couple of the ideas in Calvin: the globally-agreed sequence, deterministic, coordination-free transactions, consistent replication, and pluggable storage. Tupelo applies this to the old linda/tuplespace idea: a shared store with take, read, write ops. On the cross-partition question, tupelo punts: such transactions are not allowed. Transactions always have 2-hop latency (except for local reads). See https://github.com/vjoel/tupelo.
+
+
+    On 01/11/2014 11:37 AM, Alexander Thomson wrote:
+
+        Hi Joel,
+
+        If I lived closer by, I would be honored to present my work on Calvin to
+        the SF DC meetup---I live in Cambridge, MA (and commute to NYC for a few
+        days each week), however, and it is unlikely that I will visit
+        California at all this year. But if I do get called to MTV with a
+        reasonable amount of advanced notice, I'll let you know.
+
+        Meanwhile if you have any more technical questions or thoughts about
+        deterministic concurrency control, etc., I am happy to discuss further
+        over email.
+
+        Cheers,
+        Alex
+
+
+
+        On Fri, Jan 10, 2014 at 12:49 PM, Joel VanderWerf
+        <joelvanderwerf@gmail.com <mailto:joelvanderwerf@gmail.com>> wrote:
+
+            Alex,
+
+            If you're interested in presenting Calvin or any similar topic to an
+            audience of distributed computing practitioners, the SF Distributed
+            Computing meetup would, I'm quite sure, be interested in hosting
+            you. The organizer is Polly Ing, whom you can contact through the
+            meetup site (or I can put you in touch with her by direct email):
+
+            http://www.meetup.com/San-__Francisco-Distributed-__Computing
+            <http://www.meetup.com/San-Francisco-Distributed-Computing>
+
+            The group started last June. Recent speakers:
+
+            * Solomon Hykes and colleagues from dotCloud talking about docker
+
+            * Tobi Knaup of Mesosphere (formerly lead eng. at AirBnb) talking
+            about mesos and Marathon
+
+            * Arup Chakrabarti of Pager Duty talking about uptime / availability
+
+            * me (formerly of UC Berkeley and a spinoff startup) talking about
+            tuplespaces and tupelo
+
+            We usually get about 40-50 people, mostly from the SF startup scene.
+
+            Cheers,
+            Joel
+
+            ps. thanks for the explanation to Moses--he did appreciate it, as did I.
+
+
+
+
