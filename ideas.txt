@@ -8,9 +8,16 @@ possible approach
     TLA+
     see newcombe-slides.pdf
 
-not model for verification, but for learning, understanding *intent*, examining obvious corner cases
+not model for verification
+  but for learning, understanding *intent*, examining obvious corner cases
+  
   model to answer the question: what is original and interesting about
   the approach in the paper
+  
+  explicit scheduling
+    model concurrent transactions in a single-threaded env
+
+generate graphviz diagram of space-time
 
 talk to:
   R. Escriva about h-store?
