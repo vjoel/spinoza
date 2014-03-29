@@ -20,6 +20,7 @@ not model for verification
   other verification and testing tools
     http://concuerror.com/
     finding-race-conditions.pdf -- QuickCheck and PULSE
+    http://research.microsoft.com/en-us/projects/chess/
 
 generate graphviz diagram of space-time
 
