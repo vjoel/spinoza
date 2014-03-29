@@ -21,7 +21,8 @@ generate graphviz diagram of space-time
 
 talk to:
   R. Escriva about h-store?
-  
+  palvaro, kellabyte, edward r (all mentioned calvin on twitter)
 
 presentation ideas
+  dist sys astronomy
   https://speakerdeck.com/mrb/papers-we-love-a-unified-theory-of-garbage-collection
