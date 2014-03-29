@@ -17,6 +17,10 @@ not model for verification
   explicit scheduling
     model concurrent transactions in a single-threaded env
 
+  other verification and testing tools
+    http://concuerror.com/
+    finding-race-conditions.pdf -- QuickCheck and PULSE
+
 generate graphviz diagram of space-time
 
 talk to:
