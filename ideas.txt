@@ -11,8 +11,12 @@ possible approach
 not model for verification
   but for learning, understanding *intent*, examining obvious corner cases
   
-  model to answer the question: what is original and interesting about
-  the approach in the paper
+  model to answer the question:
+    what is original and interesting about
+      the approach in the paper
+    what's different from classical approaches?
+      from hyperdex, h-store?
+      from voltdb?
   
   explicit scheduling
     model concurrent transactions in a single-threaded env
@@ -23,6 +27,12 @@ not model for verification
     http://research.microsoft.com/en-us/projects/chess/
 
 generate graphviz diagram of space-time
+
+read
+  hstore-lookingglass.pdf
+  p378-mohan.pdf
+  paxos-simple.pdf
+  spanner.pdf
 
 talk to:
   R. Escriva about h-store?
