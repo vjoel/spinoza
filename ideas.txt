@@ -41,3 +41,6 @@ talk to:
 presentation ideas
   dist sys astronomy
   https://speakerdeck.com/mrb/papers-we-love-a-unified-theory-of-garbage-collection
+  
+Is this relevant for modeling?
+  http://aphyr.com/posts/309-knossos-redis-and-linearizability
