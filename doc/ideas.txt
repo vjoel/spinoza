@@ -44,3 +44,5 @@ presentation ideas
   
 Is this relevant for modeling?
   http://aphyr.com/posts/309-knossos-redis-and-linearizability
+
+look at secretlivesofdata
