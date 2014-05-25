@@ -9,6 +9,13 @@ The model of the underlying computer and network system is in lib/spinoza/system
 
 Calvin is developed by the Yale Databases group; the open-source releases are at https://github.com/yaledb.
 
+To do
+=====
+
+* The performance and error modeling should optionally be statistical.
+
+* `Log#time_replicated` should be a function of the reading node and depend on the link characteristics between that node and the writing node.
+
 Contact
 =======
 

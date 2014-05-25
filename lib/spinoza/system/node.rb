@@ -9,7 +9,9 @@ class Spinoza::Node
   attr_reader :lock_manager
   attr_reader :links
   
-  # Local clock.
+  # Local clock. All nodes run on the same global time line, since the model is
+  # not itself distributed, but, at a given time in a run of the model,
+  # not all nodes are at the same point on that time line.
   attr_reader :time_now
   
   # Create a node whose store contains the specified tables and which has
