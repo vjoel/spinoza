@@ -23,5 +23,15 @@ class TestLink < Minitest::Test
     assert_nil @link.recv
     @node2.evolve 0.2
     assert_equal "hello", @link.recv
+    assert_equal nil, @link.recv
+  end
+  
+  def test_fifo
+    @link.send "foo"
+    @link.send "bar"
+    @node2.evolve 1.0
+    assert_equal "foo", @link.recv
+    assert_equal "bar", @link.recv
+    assert_equal nil, @link.recv
   end
 end
