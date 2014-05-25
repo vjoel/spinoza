@@ -1,6 +1,8 @@
 require 'spinoza/common'
 
 module Spinoza
+  # Operations are stateless and do not reference any particular store. Hence
+  # they can be serialized and passed around the system.
   class Operation
     # Name of table.
     attr_reader :table
@@ -21,7 +23,7 @@ module Spinoza
 
   class InsertOperation < Operation
     attr_reader :row
-    def initialize txn, table: table, row: row
+    def initialize txn = nil, table: table, row: row
       @txn = txn
       @table, @row = table, row
     end
@@ -37,7 +39,7 @@ module Spinoza
 
   class UpdateOperation < Operation
     attr_reader :key, :row
-    def initialize txn, table: table, row: row, key: key
+    def initialize txn = nil, table: table, row: row, key: key
       @txn = txn
       @table, @key, @row = table, key, row
     end
@@ -53,25 +55,25 @@ module Spinoza
 
   class DeleteOperation < Operation
     attr_reader :key
-    def initialize txn, table: table, key: key
+    def initialize txn = nil, table: table, key: key
       @txn = txn
       @table, @key = table, key
     end
 
     def execute ds
-      ds.where(key).delete(row)
+      ds.where(key).delete
     end
   end
 
   class ReadOperation < Operation
     attr_reader :key
-    def initialize txn, table: table, key: key
+    def initialize txn = nil, table: table, key: key
       @txn = txn
       @table, @key = table, key
     end
 
     def execute ds
-      ReadResult(op: self, val: ds.where(key).all)
+      ReadResult.new(op: self, val: ds.where(key).all)
     end
   end
 
