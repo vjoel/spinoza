@@ -30,7 +30,7 @@ class Spinoza::Link
   # The dst node calls this to recv a message, if one is available.
   def recv
     t, m = @channel.first
-    if t < dst.time_now
+    if t && t <= dst.time_now
       @channel.shift
       m
     else
