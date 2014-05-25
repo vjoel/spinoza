@@ -1,6 +1,7 @@
 require 'spinoza/common'
 
-# Model of asynchronously replicated global log, such as Cassandra.
+# Model of asynchronously replicated global log, such as Cassandra. We assume
+# that each node in our system has a replica providing this service.
 class Spinoza::Log
   # Delay to become durable on "enough" replicas, from the point of view of the
   # writing node. Adjust this quantity for your definition of durable and your
@@ -57,6 +58,14 @@ class Spinoza::Log
     entry && entry.durable?
   end
   
+  def time_durable id
+    @store[id].time_durable
+  end
+
+  def time_replicated id
+    @store[id].time_replicated
+  end
+
   # Returns the entry.
   def write key, value, node: nil
     raise KeyConflictError if @store[key] or not value

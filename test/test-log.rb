@@ -28,6 +28,9 @@ class TestLog < Minitest::Test
       @log.write "a", 1, node: @sender
     end
 
+    assert_equal 0.300, @log.time_durable("a")
+    assert_equal 0.500, @log.time_replicated("a")
+    
     assert_equal 1, @log.read("a", node: @sender)
     assert_equal nil, @log.read("a", node: @recver)
     
