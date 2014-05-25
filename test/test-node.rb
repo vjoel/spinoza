@@ -5,11 +5,9 @@ include Spinoza
 
 class TestNode < Minitest::Test
   def setup
-    @node = Node.new(
-      tables: [
-        Table[:foos, id: "integer", name: "string", len: "float"]
-      ]
-    )
+    @node = Node[
+      Table[:foos, id: "integer", name: "string", len: "float"]
+    ]
   end
   
   def test_store

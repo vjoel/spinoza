@@ -6,7 +6,6 @@ require 'spinoza/system/operation'
 class Spinoza::Store
   def initialize *tables
     @db = Sequel.sqlite
-    @tables = tables
 
     tables.each do |table|
       @db.create_table table.name do

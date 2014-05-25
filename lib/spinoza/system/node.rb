@@ -14,11 +14,15 @@ class Spinoza::Node
   
   # Create a node whose store contains the specified tables and which has
   # its own lock manager.
-  def initialize tables: []
+  def initialize *tables
     @store = Store.new *tables
     @lock_manager = LockManager.new
     @links = []
     @time_now = 0.0
+  end
+  
+  class << self
+    alias [] new
   end
   
   def evolve dt

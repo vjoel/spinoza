@@ -15,6 +15,10 @@ class Spinoza::Link
     @channel = MultiRBTree.new
   end
   
+  class << self
+    alias [] new
+  end
+  
   # The src node calls this to send a message.
   def send msg
     if msg.nil?
