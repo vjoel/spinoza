@@ -1,10 +1,13 @@
 require 'spinoza/common'
 
 # Manages concurrency in the spinoza system model, which explicitly schedules
-# all database reads and writes.
+# all database reads and writes. So all this does is check for concurrency
+# violations; nothing actually blocks.
 class Spinoza::LockManager
   class ConcurrencyError < StandardError; end
   
+  # State of lock on one resource (e.g., a row), which may be held concurrently
+  # by any number of threads. Reentrant.
   class ReadLock
     attr_reader :txns
 
@@ -13,12 +16,12 @@ class Spinoza::LockManager
       add txn
     end
     
-    def unlocked
-      @txns.empty?
+    def unlocked?
+      @txns.all? {|t,c| c == 0}
     end
     
     def includes? txn
-      @txns[txn] && @txns[txn] > 0
+      @txns[txn] > 0
     end
     
     def add txn
@@ -26,109 +29,126 @@ class Spinoza::LockManager
     end
     
     def remove txn
-      if @txns[txn] > 0
-        count = (@txns[txn] -= 1)
-        if count == 0
-          @txns.delete txn
-        end
+      if includes? txn
+        @txns[txn] -= 1
+        @txns.delete txn if @txns[txn] == 0
       else
-        raise ConcurrencyError, "not locked by this transaction: #{self}"
+        raise ConcurrencyError, "#{self} is not locked by #{txn}"
       end
     end
   end
 
+  # State of lock on one resource (e.g., a row), which may be held concurrently
+  # by at most one thread. Reentrant.
   class WriteLock
-    attr_reader :txn
+    attr_reader :txn, :count
 
     def initialize txn
       @txn = txn
+      @count = 1
     end
     
+    def unlocked?
+      @txn == nil
+    end
+
     def includes? txn
-      @txn == txn
+      @txn == txn && @count > 0
+    end
+    
+    def add txn
+      if includes? txn
+        @count += 1
+      else
+        raise ConcurrencyError, "#{self} is not locked by #{txn}"
+      end
     end
 
     def remove txn
-      if @txn == txn
-        @txn = nil
+      if includes? txn
+        @count -= 1
+        @txn = nil if @count == 0
       else
-        raise ConcurrencyError, "not locked by this transaction: #{self}"
+        raise ConcurrencyError, "#{self} is not locked by #{txn}"
       end
     end
   end
 
-   # { [table, key] => WriteLock | ReadLock | nil, ... }
+   # { resource => WriteLock | ReadLock | nil, ... }
+   # typically, resource == [table, key]
   attr_reader :locks
   
   def initialize
     @locks = {}
   end
   
-  def lock_read table, key, txn
-    case lock = locks[ [table, key] ]
+  def lock_read resource, txn
+    case lock = locks[resource]
     when nil
-      locks[ [table, key] ] = ReadLock.new(txn)
+      locks[resource] = ReadLock.new(txn)
     when ReadLock
       lock.add txn
     when WriteLock
-      raise ConcurrencyError, "#{[table, key]} is locked: #{lock}"
+      raise ConcurrencyError, "#{resource} is locked: #{lock}"
+    else raise
     end
   end
   
-  def lock_write table, key, txn
-    case lock = locks[ [table, key] ]
+  def lock_write resource, txn
+    case lock = locks[resource]
     when nil
-      locks[ [table, key] ] = WriteLock.new(txn)
-    else
-      raise ConcurrencyError, "#{[table, key]} is locked: #{lock}"
+      locks[resource] = WriteLock.new(txn)
+    when WriteLock
+      lock.add txn
+    when ReadLock
+      raise ConcurrencyError, "#{resource} is locked: #{lock}"
+    else raise
     end
   end
   
-  def unlock_read table, key, txn
-    lock = locks[ [table, key] ]
+  def unlock_read resource, txn
+    lock = locks[resource]
     case lock
     when WriteLock
-      raise ConcurrencyError, "#{[table, key]} is write locked: #{lock}"
+      raise ConcurrencyError, "#{resource} is write locked: #{lock}"
     when nil
-      raise ConcurrencyError, "#{[table, key]} is not locked"
-    else
+      raise ConcurrencyError, "#{resource} is not locked"
+    when ReadLock
       begin
         lock.remove txn
-        if lock.unlocked
-          locks.delete [table, key]
-        end
+        locks.delete resource if lock.unlocked?
       rescue ConcurrencyError => ex
-        raise ConcurrencyError "#{[table, key]} is #{ex.message}"
+        raise ConcurrencyError "#{resource}: #{ex.message}"
       end
+    else raise
     end
   end
   
-  def unlock_write table, key, txn
-    lock = locks[ [table, key] ]
+  def unlock_write resource, txn
+    lock = locks[resource]
     case lock
     when ReadLock
-      raise ConcurrencyError, "#{[table, key]} is read locked: #{lock}"
+      raise ConcurrencyError, "#{resource} is read locked: #{lock}"
     when nil
-      raise ConcurrencyError, "#{[table, key]} is not locked"
-    else
+      raise ConcurrencyError, "#{resource} is not locked"
+    when WriteLock
       begin
         lock.remove txn
-        locks.delete [table, key]
+        locks.delete resource if lock.unlocked?
       rescue ConcurrencyError => ex
-        raise ConcurrencyError "#{[table, key]} is #{ex.message}"
+        raise ConcurrencyError "#{resource}: #{ex.message}"
       end
+    else raise
     end
   end
   
-  def has_read_lock? table, key, txn
-    lock = locks[ [table, key] ]
+  def has_read_lock? resource, txn
+    lock = locks[resource]
     lock.kind_of?(ReadLock) && lock.includes?(txn)
   end
   
-  def has_write_lock? table, key, txn
-    lock = locks[ [table, key] ]
+  def has_write_lock? resource, txn
+    lock = locks[resource]
     lock.kind_of?(WriteLock) && lock.includes?(txn)
   end
-  
-  ### block versions (yield)?
 end
