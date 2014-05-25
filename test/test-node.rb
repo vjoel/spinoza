@@ -6,7 +6,9 @@ include Spinoza
 class TestNode < Minitest::Test
   def setup
     @node = Node.new(
-      TableSpec.new :foos, id: "integer", name: "string", len: "float"
+      tables: [
+        TableSpec[:foos, id: "integer", name: "string", len: "float"]
+      ]
     )
   end
   

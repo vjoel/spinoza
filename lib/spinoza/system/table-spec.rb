@@ -28,4 +28,8 @@ class Spinoza::TableSpec
       @column_specs << ColumnSpec.new(col_name, col_type, (i==0))
     end
   end
+  
+  class << self
+    alias [] new
+  end
 end

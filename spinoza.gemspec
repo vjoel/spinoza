@@ -32,4 +32,5 @@ Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new("~> 2.0")
   s.add_runtime_dependency 'sequel', '~> 0'
   s.add_runtime_dependency 'sqlite3', '~> 0'
+  s.add_runtime_dependency 'rbtree', '~> 0'
 end
