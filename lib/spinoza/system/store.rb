@@ -4,19 +4,19 @@ require 'spinoza/system/operation'
 # Represents the storage at one node. In our model, this consists of an
 # in-memory sqlite database with some very simple tables.
 class Spinoza::Store
-  def initialize *table_specs
+  def initialize *tables
     @db = Sequel.sqlite
-    @table_specs = table_specs
+    @tables = tables
 
-    table_specs.each do |table_spec|
-      @db.create_table table_spec.name do
-        table_spec.column_specs.each do |col|
+    tables.each do |table|
+      @db.create_table table.name do
+        table.columns.each do |col|
           case col.type
           when "integer", "string", "float"
             column col.name, col.type, primary_key: col.primary
           else
             raise ArgumentError,
-              "Bad col.type: #{col.type} in table #{table_spec.name}"
+              "Bad col.type: #{col.type} in table #{table.name}"
           end
         end
       end

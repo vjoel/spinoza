@@ -1,5 +1,5 @@
 require 'spinoza/system/store'
-require 'spinoza/system/table-spec'
+require 'spinoza/system/table'
 require 'spinoza/system/lock-manager'
 
 # A top level entity in the system model, representing one node of

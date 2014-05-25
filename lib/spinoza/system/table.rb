@@ -1,11 +1,11 @@
 require 'spinoza/common'
 
-# Defines the schema for one table in all replicas.
-class Spinoza::TableSpec
+# Defines the schema for one table in all replicas. No state.
+class Spinoza::Table
   attr_reader :name
-  attr_reader :column_specs
+  attr_reader :columns
   
-  class ColumnSpec
+  class Column
     attr_reader :name
     attr_reader :type
     attr_reader :primary
@@ -23,9 +23,9 @@ class Spinoza::TableSpec
   #
   def initialize name, **specs
     @name = name
-    @column_specs = []
+    @columns = []
     specs.each_with_index do |(col_name, col_type), i|
-      @column_specs << ColumnSpec.new(col_name, col_type, (i==0))
+      @columns << Column.new(col_name, col_type, (i==0))
     end
   end
   
