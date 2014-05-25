@@ -38,4 +38,7 @@ class TestNode < Minitest::Test
     r_tuples = rslt[0].val
     assert_equal(0, r_tuples.size)
   end
+  
+  def test_locks
+  end
 end
