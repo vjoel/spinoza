@@ -6,7 +6,8 @@ include Spinoza
 class TestNode < Minitest::Test
   def setup
     @node = Node[
-      Table[:foos, id: "integer", name: "string", len: "float"]
+      Table[:foos, id: "integer", name: "string", len: "float"],
+      timeline: nil
     ]
   end
   

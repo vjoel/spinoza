@@ -1,40 +1,29 @@
-require 'rbtree'
-require 'spinoza/common'
+require 'spinoza/system/model'
+require 'spinoza/system/timeline'
 
-# Models a comm link between nodes. Contains a channel data structure which is
-# sorted on message arrival time.
-class Spinoza::Link
+# Models a comm link between nodes, including the latency between sender and
+# receiver. The class is stateless: the state of the channnel is part of the
+# global timeline.
+class Spinoza::Link < Spinoza::Model
   # Source and destination nodes.
   attr_reader :src, :dst
   
   # Delay between send by source and receive by destination.
   attr_reader :latency
   
-  def initialize src: nil, dst: nil, latency: 0.100
+  def initialize src: nil, dst: nil, latency: 0.100, **rest
+    super **rest
     @src, @dst, @latency = src, dst, latency
-    @channel = MultiRBTree.new
   end
   
   class << self
     alias [] new
   end
   
-  # The src node calls this to send a message.
+  # The src node calls this to send a message. The message is scheduled for
+  # arrival at the destination.
   def send msg
-    if msg.nil?
-      raise ArgumentError, "message cannot be nil"
-    end
-    @channel[dst.time_now + latency] = msg
-  end
-  
-  # The dst node calls this to recv a message, if one is available.
-  def recv
-    t, m = @channel.first
-    if t && t <= dst.time_now
-      @channel.shift
-      m
-    else
-      nil
-    end
+    timeline << Event[node: dst, time: time_now + latency,
+      action: :recv, msg: msg]
   end
 end

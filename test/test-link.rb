@@ -4,34 +4,40 @@ require 'spinoza/system/link'
 include Spinoza
 
 class TestLink < Minitest::Test
+  class MockNode
+    attr_reader :msgs
+    
+    def initialize
+      @msgs = []
+    end
+    
+    def recv msg: nil
+      @msgs << msg
+    end
+  end
+
   def setup
-    @node1 = Node[
-      Table[:foos, id: "integer", name: "string", len: "float"]
-    ]
-    @node2 = Node[
-      Table[:foos, id: "integer", name: "string", len: "float"]
-    ]
-    @link = Link[
+    @timeline = Timeline.new
+    @node1 = MockNode.new
+    @node2 = MockNode.new
+    @link = Link[timeline: @timeline,
       src: @node1, dst: @node2, latency: 1.0
     ]
   end
   
   def test_link
     @link.send "hello"
-    assert_nil @link.recv
-    @node2.evolve 0.9
-    assert_nil @link.recv
-    @node2.evolve 0.2
-    assert_equal "hello", @link.recv
-    assert_equal nil, @link.recv
+    assert_equal [], @node2.msgs
+    @timeline.evolve 0.9
+    assert_equal [], @node2.msgs
+    @timeline.evolve 0.2
+    assert_equal ["hello"], @node2.msgs
   end
   
   def test_fifo
     @link.send "foo"
     @link.send "bar"
-    @node2.evolve 1.0
-    assert_equal "foo", @link.recv
-    assert_equal "bar", @link.recv
-    assert_equal nil, @link.recv
+    @timeline.evolve 1.0
+    assert_equal ["foo", "bar"], @node2.msgs
   end
 end
