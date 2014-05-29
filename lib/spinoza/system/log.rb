@@ -28,8 +28,8 @@ class Spinoza::Log
     # When, in the global timeline, this entry is completely replicated.
     attr_reader :time_replicated
     
-    def initialize node: nil, value: nil,
-        time_durable: nil, time_replicated: nil
+    def initialize node: raise, value: raise,
+        time_durable: raise, time_replicated: raise
       @node, @value, @time_durable, @time_replicated =
         node, value, time_durable, time_replicated
     end
@@ -67,7 +67,7 @@ class Spinoza::Log
   end
 
   # Returns the entry.
-  def write key, value, node: nil
+  def write key, value, node: raise
     raise KeyConflictError if @store[key] or not value
     @store[key] =
       Entry.new node: node, value: value,
@@ -77,7 +77,7 @@ class Spinoza::Log
   
   # Returns the value if the data has been propagated to +node+, otherwise,
   # returns nil.
-  def read key, node: nil
+  def read key, node: raise
     entry = @store[key]
     entry && entry.readable_at?(node) ? entry.value : nil
   end

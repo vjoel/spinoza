@@ -6,7 +6,7 @@ class Spinoza::Event
 
   class << self; alias [] new; end
 
-  def initialize time: nil, actor: nil, action: nil, **data
+  def initialize time: raise, actor: raise, action: raise, **data
     @time, @actor, @action, @data = time, actor, action, data
   end
   

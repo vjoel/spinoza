@@ -28,7 +28,7 @@ class Spinoza::Node < Spinoza::Model
     alias [] new
   end
 
-  def recv msg: nil
+  def recv msg: raise
     # Defined in subclasses.
   end
 end

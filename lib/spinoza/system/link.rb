@@ -11,7 +11,7 @@ class Spinoza::Link < Spinoza::Model
   # Delay between send by source and receive by destination.
   attr_reader :latency
   
-  def initialize src: nil, dst: nil, latency: 0.100, **rest
+  def initialize src: raise, dst: raise, latency: 0.100, **rest
     super **rest
     @src, @dst, @latency = src, dst, latency
   end

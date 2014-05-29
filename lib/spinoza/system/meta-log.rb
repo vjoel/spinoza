@@ -25,8 +25,8 @@ class Spinoza::MetaLog
     # When, in the global timeline, this entry is completely replicated.
     attr_reader :time_replicated
     
-    def initialize node: nil, value: nil,
-        time_quorum: nil, time_replicated: nil
+    def initialize node: raise, value: raise,
+        time_quorum: raise, time_replicated: raise
       @node, @value, @time_quorum, @time_replicated =
         node, value, time_quorum, time_replicated
     end
@@ -68,7 +68,7 @@ class Spinoza::MetaLog
   # ID. In our use case, the value will be a key (or batch of keys) of the Log.
   # Returns an id, which can be used to retrieve the entry in the order it was
   # appended.
-  def append value, node: nil
+  def append value, node: raise
     @store << Entry.new(node: node, value: value,
       time_quorum: node.time_now + dt_quorum,
       time_replicated: node.time_now + dt_replicated)
@@ -77,7 +77,7 @@ class Spinoza::MetaLog
   
   # Returns the value if the data has been propagated to +node+, otherwise,
   # returns nil.
-  def get id, node: nil
+  def get id, node: raise
     entry = @store[id]
     entry && entry.readable_at?(node) ? entry.value : nil
   end
