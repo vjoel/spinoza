@@ -18,6 +18,9 @@ class Spinoza::Transaction
     end
     
     def insert row
+      if @key and not @key.empty?
+        raise ArgumentError, "Do not specify key in `at(...).insert(...)`."
+      end
       @txn.ops << InsertOperation.new(@txn, table: @table, row: row)
     end
 
