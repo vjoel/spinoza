@@ -1,5 +1,14 @@
 require 'spinoza/system/operation'
 
+# A txn is just a list of operations, each on a specific table and key.
+# The ACID guarantees are not provided by this class. Rather, this
+# class is just common representation of a (very simple) kind of transaction
+# that can be used by Calvin and other transaction engines built on top of
+# the system model.
+#
+# Like the operations they are composed of, transactions are stateless and do
+# not reference any particular store. Hence they can be re-used in different
+# replicas.
 class Spinoza::Transaction
   attr_reader :ops
 
@@ -25,10 +34,7 @@ class Spinoza::Transaction
     end
   end
 
-  # A txn is just a list of operations, each on a specific table and key.
-  # The ACID guarantees are not provided by this class.
-  #
-  # Example:
+  # Build a transaction using a DSL. Example:
   #
   # txn = transaction do
   #   at(:persons, name: "Fred").update(age: 41, phrase: "yabba dabba doo")

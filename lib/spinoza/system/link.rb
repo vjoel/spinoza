@@ -2,8 +2,8 @@ require 'spinoza/system/model'
 require 'spinoza/system/timeline'
 
 # Models a comm link between nodes, including the latency between sender and
-# receiver. The class is stateless: the state of the channnel is part of the
-# global timeline.
+# receiver. The class is stateless: the state of the channnel (messages and
+# their scheduled arrivals) is part of the global timeline.
 class Spinoza::Link < Spinoza::Model
   # Source and destination nodes.
   attr_reader :src, :dst

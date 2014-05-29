@@ -3,13 +3,13 @@ require 'spinoza/common'
 # Model of asynchronously replicated global log, such as Cassandra. We assume
 # that each node in our system has a replica providing this service.
 class Spinoza::Log
-  # Delay to become durable on "enough" replicas, from the point of view of the
-  # writing node. Adjust this quantity for your definition of durable and your
-  # network performance.
+  # Delay for a write to become durable on "enough" replicas, from the point of
+  # view of the writing node. Adjust this quantity for your definition of
+  # durable and your network performance.
   attr_reader :dt_durable
 
-  # Delay to become "completely" replicated: available at all nodes. Adjust this
-  # quantity for your network performance.
+  # Delay for a write to become "completely" replicated: readable at all nodes.
+  # Adjust this quantity for your network performance.
   attr_reader :dt_replicated
   
   class KeyConflictError < StandardError; end

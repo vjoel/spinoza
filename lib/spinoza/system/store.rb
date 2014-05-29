@@ -2,7 +2,8 @@ require 'sequel'
 require 'spinoza/system/operation'
 
 # Represents the storage at one node. In our model, this consists of an
-# in-memory sqlite database with some very simple tables.
+# in-memory sqlite database with some very simple tables. The state of the
+# store is exactly the sqlite database.
 class Spinoza::Store
   def initialize *tables
     @db = Sequel.sqlite

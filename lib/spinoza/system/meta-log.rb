@@ -7,8 +7,8 @@ class Spinoza::MetaLog
   # writer node.
   attr_reader :dt_quorum
   
-  # Delay to become "completely" replicated: available at all nodes. Adjust this
-  # quantity for your network performance.
+  # Delay for a write to become "completely" replicated: readable at all nodes.
+  # Adjust this quantity for your network performance.
   attr_reader :dt_replicated
 
   class Entry
