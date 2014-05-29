@@ -2,16 +2,16 @@ require 'rbtree'
 require 'spinoza/common'
 
 class Spinoza::Event
-  attr_reader :time, :node, :action, :data
+  attr_reader :time, :actor, :action, :data
 
   class << self; alias [] new; end
 
-  def initialize time: nil, node: nil, action: nil, **data
-    @time, @node, @action, @data = time, node, action, data
+  def initialize time: nil, actor: nil, action: nil, **data
+    @time, @actor, @action, @data = time, actor, action, data
   end
   
   def dispatch
-    node.send action, **data
+    actor.send action, **data
   end
 end
 
