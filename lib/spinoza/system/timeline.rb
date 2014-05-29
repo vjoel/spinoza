@@ -15,10 +15,11 @@ class Spinoza::Event
   end
 end
 
+# A timeline of events, future and past, and a current time.
 class Spinoza::Timeline
   class Error < StandardError; end
   
-  attr_reader :now
+  attr_reader :now, :future, :history
   
   def initialize
     @history = MultiRBTree.new
