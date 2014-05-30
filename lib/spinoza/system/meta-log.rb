@@ -49,7 +49,7 @@ class Spinoza::MetaLog
     @store = []
   end
   
-  # Returns true if the writing node knows that the data at +key+ has been
+  # Returns true if the writing node knows that the data at +id+ has been
   # replicated to a quorum of nodes.
   def quorum? id
     entry = @store[id]

@@ -58,12 +58,20 @@ class Spinoza::Log
     entry && entry.durable?
   end
   
-  def time_durable id
-    @store[id].time_durable
+  def time_durable key
+    @store[key].time_durable
   end
 
-  def time_replicated id
-    @store[id].time_replicated
+  def when_durable key, **event_opts
+    entry = @store[key]
+    entry.node.timeline.schedule Event[
+      time: entry.time_durable,
+      **event_opts
+    ]
+  end
+
+  def time_replicated key
+    @store[key].time_replicated
   end
 
   # Returns the entry.
