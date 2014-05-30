@@ -45,4 +45,18 @@ class TestTransaction < Minitest::Test
     assert_equal([{id: 2}, {id: 2}, {id: 3}],
       @txn.all_read_ops.map {|op| op.key})
   end
+  
+  def test_active
+    node2 = Node[
+      Table[:foos, id: "integer", name: "string", len: "float"],
+      Table[:bars, id: "integer", name: "string", len: "float"]
+    ]
+    
+    txn = Transaction.new do
+      at(:bars).insert id: 1, name: "a", len: 1.2
+    end
+    
+    refute txn.active? @node
+    assert txn.active? node2
+  end
 end

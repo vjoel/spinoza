@@ -28,7 +28,7 @@ class Spinoza::Node < Spinoza::Model
   end
 
   def tables
-    store.tables
+    @tables ||= Set[*store.tables]
   end
   
   class << self

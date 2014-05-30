@@ -64,11 +64,13 @@ class Spinoza::Transaction
     RowLocation.new(self, table, key)
   end
   
+  # {table => Set[key, ...]}
   def read_set
     scan_read_and_write_sets
     @read_set
   end
   
+  # Set[table, table, ...]
   def write_set
     scan_read_and_write_sets
     @write_set
@@ -76,8 +78,8 @@ class Spinoza::Transaction
   
   def scan_read_and_write_sets
     unless @read_set and @write_set
-      @read_set = Hash.new {|h,k| h[k] = Set[]} # {table => Set[key, ...]}
-      @write_set = Set[] # Set[table, table, ...]
+      @read_set = Hash.new {|h,k| h[k] = Set[]}
+      @write_set = Set[]
 
       ops.each do |op|
         case op
@@ -92,5 +94,10 @@ class Spinoza::Transaction
 
   def all_read_ops
     @all_read_ops ||= ops.grep(ReadOperation)
+  end
+
+  # returns true iff node contains elements of write set
+  def active? node
+    write_set.intersect? node.tables
   end
 end
