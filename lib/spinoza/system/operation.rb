@@ -35,6 +35,10 @@ module Spinoza
     def check lm
       true
     end
+
+    def inspect
+      "<insert #{table}: #{row}>"
+    end
   end
 
   class UpdateOperation < Operation
@@ -51,6 +55,10 @@ module Spinoza
     def check lm
       lm.has_write_lock? table, key, txn
     end
+
+    def inspect
+      "<update #{table} #{key}: #{row}>"
+    end
   end
 
   class DeleteOperation < Operation
@@ -63,6 +71,10 @@ module Spinoza
     def execute ds
       ds.where(key).delete
     end
+
+    def inspect
+      "<delete #{table} #{key}>"
+    end
   end
 
   class ReadOperation < Operation
@@ -74,6 +86,10 @@ module Spinoza
 
     def execute ds
       ReadResult.new(op: self, val: ds.where(key).all)
+    end
+
+    def inspect
+      "<read #{table} #{key}>"
     end
   end
 

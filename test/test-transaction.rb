@@ -39,4 +39,10 @@ class TestTransaction < Minitest::Test
     assert_equal({foos: Set[{id: 2}, {id: 3}]}, @txn.read_set)
     assert_equal(Set[:foos], @txn.write_set)
   end
+  
+  def test_all_read_ops
+    assert_equal(3, @txn.all_read_ops.size)
+    assert_equal([{id: 2}, {id: 2}, {id: 3}],
+      @txn.all_read_ops.map {|op| op.key})
+  end
 end

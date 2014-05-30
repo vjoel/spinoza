@@ -26,6 +26,10 @@ class Spinoza::Node < Spinoza::Model
     @log = log
     @meta_log = meta_log
   end
+
+  def tables
+    store.tables
+  end
   
   class << self
     alias [] new

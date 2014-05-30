@@ -87,8 +87,10 @@ class Spinoza::Transaction
           @write_set << op.table
         end
       end
-
-      freeze
     end
+  end
+
+  def all_read_ops
+    @all_read_ops ||= ops.grep(ReadOperation)
   end
 end
