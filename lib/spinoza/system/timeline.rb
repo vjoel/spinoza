@@ -11,7 +11,11 @@ class Spinoza::Event
   end
   
   def dispatch
-    actor.send action, **data
+    if data.empty?
+      actor.send action
+    else
+      actor.send action, **data
+    end
   end
 end
 

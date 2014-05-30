@@ -67,7 +67,9 @@ class Spinoza::MetaLog
   # Append value to the MetaLog, assigning it a unique monotonically increasing
   # ID. In our use case, the value will be a key (or batch of keys) of the Log.
   # Returns an id, which can be used to retrieve the entry in the order it was
-  # appended.
+  # appended. The returned id should only be used to observe the model, and not
+  # used within the model itself, since the id won't be available to the
+  # requesting process until `time_quorum(id)`.
   def append value, node: raise
     @store << Entry.new(node: node, value: value,
       time_quorum: node.time_now + dt_quorum,
