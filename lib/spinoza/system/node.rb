@@ -9,6 +9,7 @@ require 'spinoza/system/lock-manager'
 class Spinoza::Node < Spinoza::Model
   attr_reader :store
   attr_reader :lock_manager
+  attr_reader :log, :meta_log
   
   # Outgoing links to peer nodes, as a map `{node => link, ...}`.
   # Use `links[node].send(msg)` to send a message to a peer. Use Node#recv
@@ -17,11 +18,13 @@ class Spinoza::Node < Spinoza::Model
   
   # Create a node whose store contains the specified tables and which has
   # its own lock manager.
-  def initialize *tables, **rest
+  def initialize *tables, log: nil, meta_log: nil, **rest
     super **rest
     @store = Store.new *tables
     @lock_manager = LockManager.new
     @links = {}
+    @log = log
+    @meta_log = meta_log
   end
   
   class << self
