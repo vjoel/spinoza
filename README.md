@@ -16,6 +16,8 @@ To do
 
 * `Log#time_replicated` should be a function of the reading node and depend on the link characteristics between that node and the writing node.
 
+* Transactions, to be more realistic, should have dataflow dependencies among operations. (But only for non-key values, because Calvin splits dependent transsactions.)
+
 Contact
 =======
 
