@@ -10,7 +10,12 @@ class TestSequencer < Minitest::Test
     @meta_log = MetaLog.new dt_quorum: 0.300, dt_replicated: 0.500
 
     @node = Node[
-      Table[:foos, id: "integer", name: "string", len: "float"],
+      timeline: @timeline,
+      log: @log,
+      meta_log: @meta_log
+    ]
+    
+    @other_node = Node[
       timeline: @timeline,
       log: @log,
       meta_log: @meta_log
@@ -25,7 +30,7 @@ class TestSequencer < Minitest::Test
     @sequencer.accept_transaction "t2"
     @timeline.evolve @dt
 
-    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @node)}
+    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @other_node)}
     assert_equal nil, batch_ids[0]
     assert_equal nil, batch_ids[1]
     assert_equal nil, batch_ids[2]
@@ -34,16 +39,33 @@ class TestSequencer < Minitest::Test
     @sequencer.accept_transaction "t4"
     @timeline.evolve @dt
 
-    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @node)}
+    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @other_node)}
     assert_equal nil, batch_ids[0]
     assert_equal nil, batch_ids[1]
     assert_equal nil, batch_ids[2]
 
-    @timeline.evolve 2.000
+    @timeline.evolve @log.dt_durable + @meta_log.dt_replicated - @dt
 
-    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @node)}
+    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @other_node)}
+    assert_equal [1, 1], batch_ids[0]
+    assert_equal nil, batch_ids[1]
+    assert_equal nil, batch_ids[2]
+
+    @timeline.evolve @dt
+
+    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @other_node)}
     assert_equal [1, 1], batch_ids[0]
     assert_equal [1, 2], batch_ids[1]
     assert_equal nil, batch_ids[2]
+
+    @timeline.evolve 2.000
+
+    batch_ids = (0..2).map {|i| @meta_log.get(i, node: @other_node)}
+    assert_equal [1, 1], batch_ids[0]
+    assert_equal [1, 2], batch_ids[1]
+    assert_equal nil, batch_ids[2]
+    
+    assert_equal ["t1", "t2"], @log.read([1, 1], node: @node)
+    assert_equal ["t3", "t4"], @log.read([1, 2], node: @node)
   end
 end
