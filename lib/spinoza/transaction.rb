@@ -1,4 +1,5 @@
 require 'spinoza/system/operation'
+require 'set'
 
 # A txn is just a list of operations, each on a specific table and key.
 # The ACID guarantees are not provided by this class. Rather, this
@@ -61,5 +62,33 @@ class Spinoza::Transaction
   
   def at table, **key
     RowLocation.new(self, table, key)
+  end
+  
+  def read_set
+    scan_read_and_write_sets
+    @read_set
+  end
+  
+  def write_set
+    scan_read_and_write_sets
+    @write_set
+  end
+  
+  def scan_read_and_write_sets
+    unless @read_set and @write_set
+      @read_set = Hash.new {|h,k| h[k] = Set[]} # {table => Set[key, ...]}
+      @write_set = Set[] # Set[table, table, ...]
+
+      ops.each do |op|
+        case op
+        when ReadOperation
+          @read_set[op.table] << op.key
+        else
+          @write_set << op.table
+        end
+      end
+
+      freeze
+    end
   end
 end

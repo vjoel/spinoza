@@ -9,10 +9,8 @@ class TestTransaction < Minitest::Test
     @node = Node[
       Table[:foos, id: "integer", name: "string", len: "float"]
     ]
-  end
-  
-  def test_txn
-    txn = Transaction.new do
+
+    @txn = Transaction.new do
       at(:foos).insert id: 1, name: "a", len: 1.2
       at(:foos).insert id: 2, name: "b", len: 3.4
       at(:foos, id: 2).read
@@ -22,8 +20,10 @@ class TestTransaction < Minitest::Test
       at(:foos, id: 3).update len: 7.8
       at(:foos, id: 3).read
     end
-    
-    rslt = @node.store.execute(*txn.ops)
+  end
+  
+  def test_txn
+    rslt = @node.store.execute(*@txn.ops)
     assert_equal(3, rslt.size)
 
     assert_equal(1, rslt[0].val.size)
@@ -33,5 +33,10 @@ class TestTransaction < Minitest::Test
 
     assert_equal(1, rslt[2].val.size)
     assert_equal({id: 3, name: "c", len: 7.8}, rslt[2].val[0])
+  end
+
+  def test_read_and_write_sets
+    assert_equal({foos: Set[{id: 2}, {id: 3}]}, @txn.read_set)
+    assert_equal(Set[:foos], @txn.write_set)
   end
 end

@@ -1,4 +1,3 @@
-require 'spinoza/common'
 require 'spinoza/system/model'
 
 # Accepts transaction requests from clients. The requests accepted in an epoch
@@ -24,7 +23,6 @@ class Calvin::Sequencer < Spinoza::Model
     @dt_epoch = dt_epoch
     @batch = []
     @epoch = 0
-
     @id = self.class.next_id
 
     step_epoch
