@@ -18,6 +18,10 @@ To do
 
 * Transactions, to be more realistic, should have dataflow dependencies among operations. (But only for non-key values, because Calvin splits dependent transsactions.)
 
+* Transactions also need conditionals, or, at least, conditional abort, which is needed to support the splitting mentioned above.
+
+* For comparison, implement a 2-phase commit transsaction processor on top of the Spinoza::System classes.
+
 Contact
 =======
 
