@@ -26,6 +26,10 @@ class Spinoza::Node < Spinoza::Model
     @log = log
     @meta_log = meta_log
   end
+  
+  def link dst, **opts
+    links[dst] = Spinoza::Link[timeline: timeline, src: self, dst: dst, **opts]
+  end
 
   def tables
     @tables ||= Set[*store.tables]
