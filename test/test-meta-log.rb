@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'spinoza/system/meta-log'
 
-include Spinoza
-
 class TestMetaLog < Minitest::Test
+  include Spinoza
+
   class MockNode
     attr_reader :time_now
 

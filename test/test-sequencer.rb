@@ -4,6 +4,8 @@ require 'spinoza/system/log'
 require 'spinoza/system/meta-log'
 
 class TestSequencer < Minitest::Test
+  include Spinoza
+
   def setup
     @timeline = Timeline.new
     @log = Log.new dt_durable: 0.300, dt_replicated: 0.500

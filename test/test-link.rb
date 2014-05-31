@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'spinoza/system/link'
 
-include Spinoza
-
 class TestLink < Minitest::Test
+  include Spinoza
+
   class MockNode
     attr_reader :msgs
     

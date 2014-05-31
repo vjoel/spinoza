@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'spinoza/system/timeline'
 
-include Spinoza
-
 class TestTimeline < Minitest::Test
+  include Spinoza
+
   def setup
     @tl = Timeline.new
 
@@ -51,7 +51,7 @@ class TestTimeline < Minitest::Test
     @tl.step
     
     @tl << Event[time: 0.9, actor: @node, action: :foo, x: 2]
-    assert_raises Timeline::Error do
+    assert_raises Spinoza::Timeline::Error do
       @tl.step
     end
   end

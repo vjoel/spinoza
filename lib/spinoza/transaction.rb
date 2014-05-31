@@ -10,7 +10,7 @@ require 'set'
 # Like the operations they are composed of, transactions are stateless and do
 # not reference any particular store. Hence they can be re-used in different
 # replicas.
-class Spinoza::Transaction
+module Spinoza; class Transaction
   attr_reader :ops
 
   class RowLocation
@@ -100,4 +100,4 @@ class Spinoza::Transaction
   def active? node
     write_set.intersect? node.tables
   end
-end
+end; end

@@ -20,8 +20,8 @@ class Spinoza::Node < Spinoza::Model
   # its own lock manager.
   def initialize *tables, log: nil, meta_log: nil, **rest
     super **rest
-    @store = Store.new *tables
-    @lock_manager = LockManager.new
+    @store = Spinoza::Store.new *tables
+    @lock_manager = Spinoza::LockManager.new
     @links = {}
     @log = log
     @meta_log = meta_log

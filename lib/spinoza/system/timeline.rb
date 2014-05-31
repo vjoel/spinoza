@@ -68,7 +68,7 @@ class Spinoza::Timeline
 
   private def dispatch_event event
     if event.time < now
-      raise Timeline::Error, "Event scheduled in the past: #{event}"
+      raise Error, "Event scheduled in the past: #{event}"
     end
 
     @now = event.time

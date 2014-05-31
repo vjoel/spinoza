@@ -64,7 +64,7 @@ class Spinoza::Log
 
   def when_durable key, **event_opts
     entry = @store[key]
-    entry.node.timeline.schedule Event[
+    entry.node.timeline.schedule Spinoza::Event[
       time: entry.time_durable,
       **event_opts
     ]

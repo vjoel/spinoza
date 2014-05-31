@@ -23,7 +23,7 @@ class Spinoza::Link < Spinoza::Model
   # The src node calls this to send a message. The message is scheduled for
   # arrival at the destination.
   def send msg
-    timeline << Event[actor: dst, time: time_now + latency,
+    timeline << Spinoza::Event[actor: dst, time: time_now + latency,
       action: :recv, msg: msg]
   end
 end

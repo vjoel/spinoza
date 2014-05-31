@@ -42,7 +42,7 @@ class Calvin::Sequencer < Spinoza::Model
     end
     @epoch += 1
 
-    timeline.schedule Event[
+    timeline.schedule Spinoza::Event[
       time: time_now + dt_epoch,
       actor: self,
       action: :step_epoch

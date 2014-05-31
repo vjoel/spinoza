@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'spinoza/system/node'
 
-include Spinoza
-
 class TestNode < Minitest::Test
+  include Spinoza
+
   def setup
     @node = Node[
       Table[:foos, id: "integer", name: "string", len: "float"],

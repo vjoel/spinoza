@@ -39,6 +39,6 @@ class Spinoza::Store
         op.execute @db[op.table]
       end
     end
-    results.grep(ReadResult)
+    results.grep(Spinoza::ReadResult)
   end
 end
