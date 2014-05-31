@@ -85,7 +85,7 @@ module Spinoza
     end
 
     def execute ds
-      ReadResult.new(op: self, val: ds.where(key).all)
+      ReadResult.new(op: self, val: ds.where(key).first)
     end
 
     def inspect
