@@ -33,7 +33,7 @@ class Spinoza::Store
   end
   
   # Execute the operations on this store, skipping any that do not refer to
-  # a table in this store.
+  # a table in this store. Returns array of all read results.
   def execute *operations
     results = operations.map do |op|
       if tables.include? op.table
