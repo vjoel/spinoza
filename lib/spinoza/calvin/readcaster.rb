@@ -4,7 +4,7 @@ require 'set'
 class Calvin::Readcaster
   attr_reader :node
   
-  def initialize node: node
+  def initialize node: nil
     @node = node
     @links = nil
     @tables = node.tables

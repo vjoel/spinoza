@@ -23,7 +23,7 @@ module Spinoza
 
   class InsertOperation < Operation
     attr_reader :row
-    def initialize txn = nil, table: table, row: row
+    def initialize txn = nil, table: nil, row: nil
       @txn = txn
       @table, @row = table, row
     end
@@ -43,7 +43,7 @@ module Spinoza
 
   class UpdateOperation < Operation
     attr_reader :key, :row
-    def initialize txn = nil, table: table, row: row, key: key
+    def initialize txn = nil, table: nil, row: nil, key: nil
       @txn = txn
       @table, @key, @row = table, key, row
     end
@@ -63,7 +63,7 @@ module Spinoza
 
   class DeleteOperation < Operation
     attr_reader :key
-    def initialize txn = nil, table: table, key: key
+    def initialize txn = nil, table: nil, key: nil
       @txn = txn
       @table, @key = table, key
     end
@@ -79,7 +79,7 @@ module Spinoza
 
   class ReadOperation < Operation
     attr_reader :key
-    def initialize txn = nil, table: table, key: key
+    def initialize txn = nil, table: nil, key: nil
       @txn = txn
       @table, @key = table, key
     end
@@ -97,7 +97,7 @@ module Spinoza
   # particular time.
   class ReadResult
     attr_reader :op, :val
-    def initialize op: op, val: val
+    def initialize op: nil, val: nil
       @op, @val = op, val
     end
   end
