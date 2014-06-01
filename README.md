@@ -9,6 +9,22 @@ The model of the underlying computer and network system is in lib/spinoza/system
 
 Calvin is developed by the Yale Databases group; the open-source releases are at https://github.com/yaledb.
 
+References
+==========
+
+* The Calvin papers:
+
+  * [The Case for Determinism in Database Systems](http://cs-www.cs.yale.edu/homes/dna/papers/determinism-vldb10.pdf)
+
+  * [Consistency Tradeoffs in Modern Distributed Database System Design](http://cs-www.cs.yale.edu/homes/dna/papers/abadi-pacelc.pdf)
+
+  * [Modularity and Scalability in Calvin](http://sites.computer.org/debull/A13june/calvin1.pdf)
+
+  * [Calvin: Fast Distributed Transactions for Partitioned Database Systems](http://www.cs.yale.edu/homes/dna/papers/calvin-sigmod12.pdf)
+
+  * [Lightweight Locking for Main Memory Database Systems](http://cs-www.cs.yale.edu/homes/dna/papers/vll-vldb13.pdf)
+
+
 To do
 =====
 
@@ -20,7 +36,7 @@ To do
 
 * Transactions also need conditionals, or, at least, conditional abort, which is needed to support the splitting mentioned above.
 
-* For comparison, implement a 2-phase commit transsaction processor on top of the Spinoza::System classes.
+* For comparison, implement a 2-phase commit transaction processor on top of the Spinoza::System classes.
 
 Contact
 =======
