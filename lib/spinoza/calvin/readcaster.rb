@@ -34,9 +34,13 @@ class Calvin::Readcaster
     local_read_results.group_by {|r| r.op.table}.each do |table, results|
       links[table].each do |link|
         if txn.active?(link.dst)
-          link.send transaction: txn, table: table, read_results: results
+          send_read link, transaction: txn, table: table, read_results: results
         end
       end
     end
+  end
+
+  def send_read link, **opts
+    link.send link, **opts
   end
 end
