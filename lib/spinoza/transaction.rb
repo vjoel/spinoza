@@ -70,6 +70,10 @@ module Spinoza; class Transaction
     @read_set
   end
   
+  def read_tables
+    @read_tables ||= Set[*read_set.keys]
+  end
+  
   # Set[table, table, ...]
   def write_set
     scan_read_and_write_sets
@@ -99,5 +103,13 @@ module Spinoza; class Transaction
   # returns true iff node_or_store contains elements of write set
   def active? node_or_store
     write_set.intersect? node_or_store.tables
+  end
+  
+  def all_reads_are_local? node_or_store
+    read_tables.subset? node_or_store.tables
+  end
+  
+  def remote_read_tables node_or_store
+    read_tables - node_or_store.tables
   end
 end; end

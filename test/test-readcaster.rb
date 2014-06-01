@@ -72,4 +72,16 @@ class TestReadcaster < Minitest::Test
     assert_equal 1, read_results.size
     assert_equal "b2", read_results[0].val[:name]
   end
+  
+  def test_all_reads_local
+    assert @txn.all_reads_are_local? @node
+    refute @txn.all_reads_are_local? @na
+    refute @txn.all_reads_are_local? @nb
+  end
+  
+  def test_remote_read_tables
+    assert_equal Set[], @txn.remote_read_tables(@node)
+    assert_equal Set[:bs], @txn.remote_read_tables(@na)
+    assert_equal Set[:as], @txn.remote_read_tables(@nb)
+  end
 end
