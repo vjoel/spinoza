@@ -15,7 +15,7 @@ class Calvin::Readcaster
   # which link.dst already has `table`.
   def links
     unless @links
-      @links = {}
+      @links = Hash.new {|h,k| h[k] = Set[]}
       node.links.each do |there, link|
         (@tables - there.tables).each do |table|
           @links[table] << link
