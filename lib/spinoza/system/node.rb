@@ -28,6 +28,9 @@ class Spinoza::Node < Spinoza::Model
   end
   
   def link dst, **opts
+    if links[dst]
+      raise "Link from #{self} to #{dst} already exists."
+    end
     links[dst] = Spinoza::Link[timeline: timeline, src: self, dst: dst, **opts]
   end
 
