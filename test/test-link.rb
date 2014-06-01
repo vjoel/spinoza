@@ -26,7 +26,7 @@ class TestLink < Minitest::Test
   end
   
   def test_link
-    @link.send "hello"
+    @link.send_message "hello"
     assert_equal [], @node2.msgs
     @timeline.evolve 0.9
     assert_equal [], @node2.msgs
@@ -35,8 +35,8 @@ class TestLink < Minitest::Test
   end
   
   def test_fifo
-    @link.send "foo"
-    @link.send "bar"
+    @link.send_message "foo"
+    @link.send_message "bar"
     @timeline.evolve 1.0
     assert_equal ["foo", "bar"], @node2.msgs
   end

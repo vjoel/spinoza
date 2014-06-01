@@ -12,8 +12,8 @@ class Spinoza::Node < Spinoza::Model
   attr_reader :log, :meta_log
   
   # Outgoing links to peer nodes, as a map `{node => link, ...}`.
-  # Use `links[node].send(msg)` to send a message to a peer. Use Node#recv
-  # to handle received messages.
+  # Use `links[node].send_message(msg)` to send a message to a peer.
+  # Use Node#recv to handle received messages.
   attr_reader :links
   
   # Create a node whose store contains the specified tables and which has
