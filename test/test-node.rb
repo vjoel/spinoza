@@ -12,7 +12,7 @@ class TestNode < Minitest::Test
   end
   
   def test_store
-    assert_equal [:foos], @node.store.tables
+    assert_equal Set[:foos], @node.store.tables
   end
   
   def test_ops
