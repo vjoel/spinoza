@@ -26,13 +26,9 @@ class TestTransaction < Minitest::Test
     rslt = @node.store.execute(*@txn.ops)
     assert_equal(3, rslt.size)
 
-    assert_equal(1, rslt[0].val.size)
-    assert_equal({id: 2, name: "b", len: 3.4}, rslt[0].val[0])
-
-    assert_equal(0, rslt[1].val.size)
-
-    assert_equal(1, rslt[2].val.size)
-    assert_equal({id: 3, name: "c", len: 7.8}, rslt[2].val[0])
+    assert_equal({id: 2, name: "b", len: 3.4}, rslt[0].val)
+    refute rslt[1].val
+    assert_equal({id: 3, name: "c", len: 7.8}, rslt[2].val)
   end
 
   def test_read_and_write_sets

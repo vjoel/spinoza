@@ -23,23 +23,18 @@ class TestNode < Minitest::Test
     rslt = store.execute op_i, op_r
     
     assert_equal(1, rslt.size)
-    r_tuples = rslt[0].val
-    assert_equal(1, r_tuples.size)
-    assert_equal({id: 1, name: "a", len: 1.2}, r_tuples[0])
+    assert_equal({id: 1, name: "a", len: 1.2}, rslt[0].val)
     
     op_u = UpdateOperation.new(table: :foos, key: {id: 1}, row: {name: "b"})
     rslt = store.execute op_u, op_r
     
     assert_equal(1, rslt.size)
-    r_tuples = rslt[0].val
-    assert_equal(1, r_tuples.size)
-    assert_equal({id: 1, name: "b", len: 1.2}, r_tuples[0])
+    assert_equal({id: 1, name: "b", len: 1.2}, rslt[0].val)
 
     op_d = DeleteOperation.new(table: :foos, key: {id: 1})
     rslt = store.execute op_d, op_r
     assert_equal(1, rslt.size)
-    r_tuples = rslt[0].val
-    assert_equal(0, r_tuples.size)
+    refute rslt[0].val
   end
   
   def test_locks
