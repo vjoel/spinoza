@@ -100,6 +100,10 @@ module Spinoza; class Transaction
     @all_read_ops ||= ops.grep(ReadOperation)
   end
 
+  def all_write_ops
+    @all_write_ops ||= ops - all_read_ops
+  end
+
   # returns true iff node_or_store contains elements of write set
   def active? node_or_store
     write_set.intersect? node_or_store.tables

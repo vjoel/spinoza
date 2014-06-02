@@ -43,6 +43,10 @@ class TestTransaction < Minitest::Test
       @txn.all_read_ops.map {|op| op.key})
   end
   
+  def test_all_write_ops
+    assert_equal(5, @txn.all_write_ops.size)
+  end
+
   def test_active
     node2 = Node[
       Table[:foos, id: "integer", name: "string", len: "float"],
