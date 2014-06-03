@@ -41,6 +41,6 @@ class Calvin::Readcaster
   end
 
   def send_read link, **opts
-    link.send_message link, **opts
+    link.send_message **opts
   end
 end
