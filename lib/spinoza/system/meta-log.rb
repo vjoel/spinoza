@@ -1,4 +1,4 @@
-require 'spinoza/common'
+require 'spinoza/system/timeline'
 
 # Model of synchronously replicated, linearizable global log, such as Zookeeper.
 class Spinoza::MetaLog
@@ -47,6 +47,7 @@ class Spinoza::MetaLog
     @dt_quorum = dt_quorum
     @dt_replicated = dt_replicated
     @store = []
+    @replication_listeners = []
   end
   
   # Returns true if the writing node knows that the data at +id+ has been
@@ -64,6 +65,13 @@ class Spinoza::MetaLog
     @store[id].time_replicated
   end
 
+  # Request that, whenever a new entry is created, an event be added to the
+  # schedule that will fire at entry.time_replicated. The event will send
+  # the method named `action` to `actor`, with id, node, and value arguments.
+  def on_entry_available actor, action
+    @replication_listeners << [actor, action]
+  end
+
   # Append value to the MetaLog, assigning it a unique monotonically increasing
   # ID. In our use case, the value will be a key (or batch of keys) of the Log.
   # Returns an id, which can be used to retrieve the entry in the order it was
@@ -71,10 +79,17 @@ class Spinoza::MetaLog
   # used within the model itself, since the id won't be available to the
   # requesting process until `time_quorum(id)`.
   def append value, node: raise
-    @store << Entry.new(node: node, value: value,
+    entry = Entry.new(node: node, value: value,
       time_quorum: node.time_now + dt_quorum,
       time_replicated: node.time_now + dt_replicated)
-    @store.size - 1
+    @store << entry
+    id = @store.size - 1
+    @replication_listeners.each do |actor, action|
+      node.timeline << Spinoza::Event[
+        time: entry.time_replicated, actor: actor, action: action,
+        id: id, node: node, value: value]
+    end
+    id
   end
   
   # Returns the value if the data has been propagated to +node+, otherwise,
