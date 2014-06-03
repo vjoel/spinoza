@@ -31,6 +31,40 @@ class TestExecutor < Minitest::Test
       readcaster: MockReadcaster.new(@store))
   end
   
+  def test_passive_txn
+    txn = Transaction.new do
+      at(:as, id: 1).read
+      at(:bs, id: 2).read
+      at(:cs).insert id: 3, name: "c3"
+      at(:ds, id: 4).read
+    end
+    
+    assert @executor.passive? txn
+
+    result = @executor.execute_transaction txn
+    assert result
+    assert_equal 2, result.size
+    assert_equal txn.ops[0..1], result.map {|r| r.op}
+    assert @executor.ready?
+  end
+  
+  def test_txn_with_no_remote_reads
+    txn = Transaction.new do
+      at(:as).insert id: 1, name: "a1"
+      at(:bs, id: 2).read
+      at(:cs).insert id: 3, name: "c3"
+    end
+    
+    refute @executor.passive? txn
+    assert @executor.all_reads_are_local? txn
+
+    result = @executor.execute_transaction txn
+    assert result
+    assert_equal 1, result.size
+    assert_equal txn.ops[1], result.map {|r| r.op}[0]
+    assert @executor.ready?
+  end
+  
   def test_txn_with_remote_reads
     txn = Transaction.new do
       at(:as).insert id: 1, name: "a1"
@@ -39,11 +73,21 @@ class TestExecutor < Minitest::Test
       at(:cs, id: 4).read
       at(:ds, id: 5).read
     end
+
+    refute @executor.passive? txn
     
     result = @executor.execute_transaction txn
     refute result
     refute @executor.ready?
     
+    result = @executor.recv_remote_reads :cs, [
+      ReadResult.new(val: {id: 3}),
+      ReadResult.new(val: {id: 4})
+    ]
+    refute result
+    refute @executor.ready?
+
+    # Same data, different replica:
     result = @executor.recv_remote_reads :cs, [
       ReadResult.new(val: {id: 3}),
       ReadResult.new(val: {id: 4})
