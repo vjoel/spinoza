@@ -12,6 +12,9 @@ class Spinoza::Log
   # Adjust this quantity for your network performance.
   attr_reader :dt_replicated
   
+  # We do not allow the same key to be written twice, since a key uniquely
+  # designates the logged transaction request. This error is raised if a
+  # key is overwritten.
   class KeyConflictError < StandardError; end
 
   class Entry
