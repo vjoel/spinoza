@@ -46,6 +46,7 @@ class TestNode < Minitest::Test
     lm.lock_read rs1, :t1
     assert lm.has_read_lock?(rs1, :t1)
     refute lm.has_read_lock?(rs1, :t2)
+    refute lm.has_read_lock?([:bars, 3], :t1)
 
     lm.lock_read rs1, :t2
     assert lm.has_read_lock?(rs1, :t1)
@@ -72,6 +73,8 @@ class TestNode < Minitest::Test
       lm.lock_read rs2, :t2
     end
     assert lm.has_write_lock?(rs2, :t1)
+    refute lm.has_write_lock?(rs2, :t3)
+    refute lm.has_write_lock?([:bars, 3], :t1)
 
     lm.lock_write rs2, :t1
     assert lm.has_write_lock?(rs2, :t1)
