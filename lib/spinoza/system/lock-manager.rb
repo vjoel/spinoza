@@ -93,10 +93,10 @@ class Spinoza::LockManager
     case lock = locks[resource]
     when nil
       locks[resource] = ReadLock.new(txn)
-    when ReadLock
+    when ReadLock, WriteLock
       lock.add txn
-    when WriteLock
-      raise ConcurrencyError, "#{resource} is locked: #{lock}"
+        # in WriteLock case, add the reader as a writer
+        # (fails if not locked by txn)
     else raise
     end
   end
@@ -116,11 +116,9 @@ class Spinoza::LockManager
   def unlock_read resource, txn
     lock = locks[resource]
     case lock
-    when WriteLock
-      raise ConcurrencyError, "#{resource} is write locked: #{lock}"
     when nil
       raise ConcurrencyError, "#{resource} is not locked"
-    when ReadLock
+    when ReadLock, WriteLock
       begin
         lock.remove txn
         locks.delete resource if lock.unlocked?
