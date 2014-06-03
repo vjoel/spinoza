@@ -68,6 +68,8 @@ class Spinoza::MetaLog
   # Request that, whenever a new entry is created, an event be added to the
   # schedule that will fire at entry.time_replicated. The event will send
   # the method named `action` to `actor`, with id, node, and value arguments.
+  # Note that events fire in id order (because of the strong consistency
+  # guarantees that the meta-log's underlying store is assumed to have).
   def on_entry_available actor, action
     @replication_listeners << [actor, action]
   end
