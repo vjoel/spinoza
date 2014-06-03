@@ -74,8 +74,10 @@ module Spinoza; class Transaction
     @read_tables ||= Set[*read_set.keys]
   end
   
-  # {table => Set[key|:insert, ...]}
-  # where existence of :insert means presence of inserts in txn
+  INSERT_KEY = :insert
+
+  # {table => Set[key|INSERT_KEY, ...]}
+  # where existence of INSERT_KEY means presence of inserts in txn
   def write_set
     @write_set || (scan_read_and_write_sets; @write_set)
   end
@@ -95,7 +97,7 @@ module Spinoza; class Transaction
         when ReadOperation
           @read_set[op.table] << op.key
         when InsertOperation
-          @write_set[op.table] << :insert
+          @write_set[op.table] << INSERT_KEY
         else
           @write_set[op.table] << op.key
         end

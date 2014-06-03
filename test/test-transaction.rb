@@ -33,7 +33,8 @@ class TestTransaction < Minitest::Test
 
   def test_read_and_write_sets
     assert_equal({foos: Set[{id: 2}, {id: 3}]}, @txn.read_set)
-    assert_equal({foos: Set[:insert, {id: 2}, {id: 3}]}, @txn.write_set)
+    assert_equal({foos: Set[Transaction::INSERT_KEY, {id: 2}, {id: 3}]},
+      @txn.write_set)
     assert_equal(Set[:foos], @txn.write_tables)
     assert_equal(Set[:foos], @txn.read_tables)
   end
