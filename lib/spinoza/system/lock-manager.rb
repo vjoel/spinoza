@@ -3,6 +3,10 @@ require 'spinoza/common'
 # Manages concurrency in the spinoza system model, which explicitly schedules
 # all database reads and writes. So all this does is check for concurrency
 # violations; nothing actually blocks.
+#
+# The +txn+ references in this class care only about identity, so they could
+# all be ids or they could all be transaction objects.
+#
 class Spinoza::LockManager
   class ConcurrencyError < StandardError; end
   
