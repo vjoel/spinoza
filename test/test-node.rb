@@ -83,4 +83,26 @@ class TestNode < Minitest::Test
     lm.unlock_write rs2, :t1
     refute lm.has_write_lock?(rs2, :t1)
   end
+    
+  def test_unlock_all
+    lm = @node.lock_manager
+    
+    rs1 = [:foos, 1]
+    rs2 = [:foos, 2]
+
+    lm.lock_read rs1, :t1
+    lm.lock_write rs2, :t2
+
+    lm.unlock_all :t1
+    refute lm.has_write_lock?(rs1, :t1)
+    refute lm.has_write_lock?(rs2, :t1)
+    refute lm.has_write_lock?(rs1, :t2)
+    assert lm.has_write_lock?(rs2, :t2)
+
+    lm.unlock_all :t2
+    refute lm.has_write_lock?(rs1, :t1)
+    refute lm.has_write_lock?(rs2, :t1)
+    refute lm.has_write_lock?(rs1, :t2)
+    refute lm.has_write_lock?(rs2, :t2)
+  end
 end

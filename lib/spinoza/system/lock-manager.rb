@@ -147,6 +147,15 @@ class Spinoza::LockManager
     end
   end
   
+  def unlock_all txn
+    locks.delete_if do |resource, lock|
+      if lock and lock.includes? txn
+        lock.remove txn
+        lock.unlocked?
+      end
+    end
+  end
+  
   def has_read_lock? resource, txn
     lock = locks[resource]
     lock.kind_of?(ReadLock) && lock.includes?(txn)
