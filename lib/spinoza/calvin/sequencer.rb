@@ -5,6 +5,9 @@ require 'spinoza/system/model'
 # transaction schedulers on each node.
 class Calvin::Sequencer < Spinoza::Model
   attr_reader :node
+
+  # ID used to construct UUID for batch.
+  attr_reader :id
   
   # Length of epoch in seconds.
   attr_reader :dt_epoch
