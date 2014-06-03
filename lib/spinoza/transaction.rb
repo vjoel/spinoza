@@ -66,31 +66,38 @@ module Spinoza; class Transaction
   
   # {table => Set[key, ...]}
   def read_set
-    scan_read_and_write_sets
-    @read_set
+    @read_set || (scan_read_and_write_sets; @read_set)
   end
   
+  # Set[table, table, ...]
   def read_tables
     @read_tables ||= Set[*read_set.keys]
   end
   
-  # Set[table, table, ...]
+  # {table => Set[key|:insert, ...]}
+  # where existence of :insert means presence of inserts in txn
   def write_set
-    scan_read_and_write_sets
-    @write_set
+    @write_set || (scan_read_and_write_sets; @write_set)
+  end
+
+  # Set[table, table, ...]
+  def write_tables
+    @write_tables ||= Set[*write_set.keys]
   end
   
   def scan_read_and_write_sets
     unless @read_set and @write_set
       @read_set = Hash.new {|h,k| h[k] = Set[]}
-      @write_set = Set[]
+      @write_set = Hash.new {|h,k| h[k] = Set[]}
 
       ops.each do |op|
         case op
         when ReadOperation
           @read_set[op.table] << op.key
+        when InsertOperation
+          @write_set[op.table] << :insert
         else
-          @write_set << op.table
+          @write_set[op.table] << op.key
         end
       end
     end
@@ -106,7 +113,7 @@ module Spinoza; class Transaction
 
   # returns true iff node_or_store contains elements of write set
   def active? node_or_store
-    write_set.intersect? node_or_store.tables
+    write_tables.intersect? node_or_store.tables
   end
   
   def all_reads_are_local? node_or_store
