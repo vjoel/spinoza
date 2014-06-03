@@ -5,7 +5,10 @@ require 'spinoza/common'
 # violations; nothing actually blocks.
 #
 # The +txn+ references in this class care only about identity, so they could
-# all be ids or they could all be transaction objects.
+# all be ids or they could all be transaction objects. Similarly the resource
+# being locked by a ReadLock or WriteLock can be anything whose identity is
+# defined by hash equality, i.e. #eql?. Typically, we use `[table, key]` pairs,
+# where `key` is a primary key reference like `{id: ...}`.
 #
 class Spinoza::LockManager
   class ConcurrencyError < StandardError; end
@@ -78,8 +81,8 @@ class Spinoza::LockManager
     end
   end
 
-   # { resource => WriteLock | ReadLock | nil, ... }
-   # typically, resource == [table, key]
+  # { resource => WriteLock | ReadLock | nil, ... }
+  # typically, resource == [table, key]
   attr_reader :locks
   
   def initialize
