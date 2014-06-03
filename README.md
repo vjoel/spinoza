@@ -28,15 +28,22 @@ References
 To do
 =====
 
-* The performance and error modeling should optionally be statistical.
+* The performance and error modeling should optionally be statistical, with variation using some distribution.
+
+* Model IO latency and compute time.
 
 * `Log#time_replicated` should be a function of the reading node and depend on the link characteristics between that node and the writing node.
 
-* Transactions, to be more realistic, should have dataflow dependencies among operations. (But only for non-key values, because Calvin splits dependent transsactions.)
+* Transactions, to be more realistic, should have dataflow dependencies among operations. (But only for non-key values, because Calvin splits dependent transactions.)
 
 * Transactions also need conditionals, or, at least, conditional abort, which is needed to support the splitting mentioned above.
 
 * For comparison, implement a 2-phase commit transaction processor on top of the Spinoza::System classes.
+
+* Output spacetime diagrams using graphviz.
+
+* See also 'TODO' in code.
+
 
 Contact
 =======
