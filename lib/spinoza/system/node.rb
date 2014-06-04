@@ -39,6 +39,10 @@ class Spinoza::Node < Spinoza::Model
     "<Node #{name}>"
   end
   
+  def to_s
+    name.to_s
+  end
+  
   def link dst, **opts
     if links[dst]
       raise "Link from #{self} to #{dst} already exists."
