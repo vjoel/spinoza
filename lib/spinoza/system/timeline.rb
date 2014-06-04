@@ -1,6 +1,9 @@
 require 'rbtree'
 require 'spinoza/common'
 
+# Events are the way we model the passage of time in a concurrent system. An
+# event action initiates some action at some time. The action happens
+# instantaneously on the timeline, except by scheduling later events.
 class Spinoza::Event
   attr_reader :time, :actor, :action, :data
 
