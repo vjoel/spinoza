@@ -85,7 +85,7 @@ class Calvin::Scheduler
       end
 
     else
-      node.lock_manager.unlock_all transaction
+      node.lock_manager.unlock_all txn
       # nothing to do until some executor finishes its current transaction
       ## TODO optimization: attempt to reorder another txn to the head
       ## of the work_queue where lock sets are disjoint.
