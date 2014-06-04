@@ -44,6 +44,8 @@ class Spinoza::Node < Spinoza::Model
   end
   
   def link dst, **opts
+    require 'spinoza/system/link'
+
     if links[dst]
       raise "Link from #{self} to #{dst} already exists."
     end
