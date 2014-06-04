@@ -21,7 +21,7 @@ class TestTransaction < Minitest::Test
       at(:foos, id: 3).read
     end
   end
-  
+
   def test_txn
     rslt = @node.store.execute(*@txn.ops)
     assert_equal(3, rslt.size)

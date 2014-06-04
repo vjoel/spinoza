@@ -1,15 +1,23 @@
 require 'spinoza/system/operation'
 require 'set'
 
-# A txn is just a list of operations, each on a specific table and key.
+# A transaction is just a list of operations, each on a specific table and key.
+#
 # The ACID guarantees are not provided by this class. Rather, this
 # class is just common representation of a (very simple) kind of transaction
 # that can be used by Calvin and other transaction engines built on top of
 # the system model.
 #
+# Transactions submitted to Calvin are not as general as this class indicates.
+# They should be split up into transactions each of which consists of reads
+# followed by writes, and the row IDs of the writes should be independent of the
+# read results. This is necessary for the Scheduler and the Readcaster
+# protocols. (See the discussion of OLLP in the Calvin papers.)
+#
 # Like the operations they are composed of, transactions are stateless and do
 # not reference any particular store. Hence they can be re-used in different
 # replicas.
+#
 module Spinoza; class Transaction
   attr_reader :ops
 
