@@ -10,10 +10,10 @@ class Calvin::Node < Spinoza::Node
       sequencer: nil, scheduler: nil, **rest
     super *tables, **rest
 
-    @sequencer = sequencer || Calvin::Sequencer.new(node: self)
-    @scheduler = scheduler || Calvin::Scheduler.new(node: self)
     @log = log
     @meta_log = meta_log
+    @sequencer = sequencer || Calvin::Sequencer.new(node: self)
+    @scheduler = scheduler || Calvin::Scheduler.new(node: self)
   end
 
   def recv **opts
