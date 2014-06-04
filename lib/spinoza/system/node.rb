@@ -7,6 +7,7 @@ require 'spinoza/system/lock-manager'
 # the distributed system, typically one per host. Nodes are connected by Links.
 # Node is stateful.
 class Spinoza::Node < Spinoza::Model
+  attr_reader :name
   attr_reader :store
   attr_reader :lock_manager
   
@@ -15,13 +16,27 @@ class Spinoza::Node < Spinoza::Model
   # Use Node#recv to handle received messages.
   attr_reader :links
   
+  @next_name = 0
+  def self.new_name
+    @next_name.tap {@next_name += 1}.to_s
+  end
+
+  def new_name
+    Spinoza::Node.new_name
+  end
+  
   # Create a node whose store contains the specified tables and which has
   # its own lock manager.
-  def initialize *tables, **rest
+  def initialize *tables, name: new_name, **rest
     super **rest
     @store = Spinoza::Store.new *tables
+    @name = name
     @lock_manager = Spinoza::LockManager.new
     @links = {}
+  end
+  
+  def inspect
+    "<Node #{name}>"
   end
   
   def link dst, **opts
