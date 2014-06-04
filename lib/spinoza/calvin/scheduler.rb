@@ -121,7 +121,9 @@ class Calvin::Scheduler
 
   def finish_transaction transaction, result
     ex = ex_for_txn.delete(transaction)
-    idle_executors.push ex
+    if ex
+      idle_executors.push ex
+    end
     node.lock_manager.unlock_all transaction
     node.finished_transaction transaction, result
   end
