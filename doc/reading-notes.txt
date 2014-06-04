@@ -1,5 +1,0 @@
-understand these earlier replication techniques
-  Log shipping, eager commit protocols, and lazy synchronization (vldb10 p.1)
-
-get ref [24] of vldb10
-
