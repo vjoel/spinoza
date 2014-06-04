@@ -30,6 +30,12 @@ class TestScheduler < Minitest::Test
   end
 
   def test_scheduler_without_peers
+    @results = []
+    @node.on_transaction_finish do |txn, rslt|
+      @results << rslt.map {|rr| rr.val} ### add @node.timeline.now to this
+      #@node.default_output txn, rslt
+    end
+    
     txn1 = transaction do
       at(:foos).insert id: 1, name: "a"
       at(:foos).insert id: 2, name: "b"
@@ -42,10 +48,20 @@ class TestScheduler < Minitest::Test
       at(:foos, id: 3).update name: "cc"
     end
 
+    txn3 = transaction do
+      at(:foos, id: 1).read
+      at(:foos, id: 2).read
+      at(:foos, id: 3).read
+    end
+
     @node.sequencer.accept_transaction txn1
     @node.sequencer.accept_transaction txn2
+    @node.sequencer.accept_transaction txn3
 
     @timeline.evolve 2.0
     
+    assert_empty @results[0]
+    assert_equal [{id: 1, name: "a"}], @results[1]
+    assert_equal [{id: 1, name: "a"}, nil, {id: 3, name: "cc"}], @results[2]
   end
 end
