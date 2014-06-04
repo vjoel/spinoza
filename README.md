@@ -1,7 +1,7 @@
 spinoza
 =======
 
-A model of the Calvin distributed database. The main purpose of this model is expository, rather than analysis for correctness or performance.
+A model of the Calvin distributed database. The main purpose of this model is expository, rather than analysis for correctness or performance. All concurrency and distribution is modeled in a single-threaded process with in-memory data tables, which makes it easier to understand what is happening.
 
 Spinoza, like Calvin, was a philosopher who dealt in determinism.
 
