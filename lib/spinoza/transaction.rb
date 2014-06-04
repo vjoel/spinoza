@@ -69,8 +69,8 @@ module Spinoza
     def initialize &block
       @ops = []
       @closed = false
-      @read_set = Hash.new {|h,k| h[k] = Set[]}
-      @write_set = Hash.new {|h,k| h[k] = Set[]}
+      @read_set = {}
+      @write_set = {}
 
       if block
         if block.arity == 0
@@ -119,17 +119,18 @@ module Spinoza
         if reads_a_write?(op)
           warn "reading your writes in a transaction may not be supported #{op}"
         end
-        @read_set[op.table] << op.key
+        (@read_set[op.table] ||= Set[]) << op.key
       when InsertOperation
-        @write_set[op.table] << INSERT_KEY
+        (@write_set[op.table] ||= Set[]) << INSERT_KEY
       else
-        @write_set[op.table] << op.key
+        (@write_set[op.table] ||= Set[]) << op.key
       end
       @ops << op
     end
 
     def reads_a_write? op
-      @write_set[op.table].include? op.key
+      s = @write_set[op.table]
+      s && s.include?(op.key)
     end
 
     # {table => Set[key, ...]}
