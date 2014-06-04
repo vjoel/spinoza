@@ -29,7 +29,7 @@ class Spinoza::Store
   end
   
   def inspect
-    "<#{self.class.name}: #{tables.join(', ')}>"
+    "<#{self.class.name}: #{tables.to_a.join(', ')}>"
   end
   
   # Execute the operations on this store, skipping any that do not refer to
