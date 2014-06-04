@@ -39,7 +39,7 @@ class TestReadcaster < Minitest::Test
     # normally this is part of a Calvin::Node, but here we have a System::Node
     @readcaster = Calvin::Readcaster.new(node: @node)
 
-    @txn = Transaction.new do
+    @txn = transaction do
       at(:as).insert id: 1, name: "a1"
       at(:as, id: 2).read
       at(:bs, id: 2).read

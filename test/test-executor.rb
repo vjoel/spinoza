@@ -32,7 +32,7 @@ class TestExecutor < Minitest::Test
   end
   
   def test_passive_txn
-    txn = Transaction.new do
+    txn = transaction do
       at(:as, id: 1).read
       at(:bs, id: 2).read
       at(:cs).insert id: 3, name: "c3"
@@ -49,7 +49,7 @@ class TestExecutor < Minitest::Test
   end
   
   def test_txn_with_no_remote_reads
-    txn = Transaction.new do
+    txn = transaction do
       at(:as).insert id: 1, name: "a1"
       at(:bs, id: 2).read
       at(:cs).insert id: 3, name: "c3"
@@ -66,7 +66,7 @@ class TestExecutor < Minitest::Test
   end
   
   def test_txn_with_remote_reads
-    txn = Transaction.new do
+    txn = transaction do
       at(:as).insert id: 1, name: "a1"
       at(:bs, id: 2).read
       at(:cs, id: 3).read
