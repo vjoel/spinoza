@@ -48,7 +48,7 @@ class Calvin::Scheduler
 
   # Handle messages from peers. The only messages are the unidirectional
   # broadcasts of read results.
-  def recv transaction: raise, table: raise, read_results: raise
+  def recv_peer_results transaction: raise, table: raise, read_results: raise
     ex = ex_for_txn[transaction]
     if ex
       result = ex.recv_remote_reads table, read_results
