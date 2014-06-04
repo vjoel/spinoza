@@ -23,8 +23,8 @@ class Calvin::Node < Spinoza::Node
     puts "%07.6f [RESULT] #{transaction} => #{r}" % timeline.now
   end
 
-  def recv **opts
-    scheduler.recv **opts
+  def recv msg: nil
+    scheduler.recv_peer_results **msg
   end
   
   def read_batch batch_id
