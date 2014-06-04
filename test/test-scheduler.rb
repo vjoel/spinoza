@@ -16,7 +16,10 @@ class TestScheduler < Minitest::Test
     }
   end
   
-  # spec is an array of arrays of Tables
+  FOOS = Table[:foos, id: "integer", name: "string"]
+  BARS = Table[:bars, id: "integer", name: "string"]
+
+  # spec is an array of arrays of Tables, such as [ [FOOS], [FOOS, BARS] ]
   def mknodes spec
     @nodes = spec.map do |tables|
       Calvin::Node[
@@ -46,11 +49,7 @@ class TestScheduler < Minitest::Test
   end
 
   def test_one_node
-    mknodes [
-      [
-        Table[:foos, id: "integer", name: "string"]
-      ]
-    ]
+    mknodes [ [FOOS] ]
 
     txn1 = transaction do
       at(:foos).insert id: 1, name: "a"
@@ -86,14 +85,7 @@ class TestScheduler < Minitest::Test
   end
 
   def test_two_nodes_same_tables
-    mknodes [
-      [
-        Table[:foos, id: "integer", name: "string"]
-      ],
-      [
-        Table[:foos, id: "integer", name: "string"],
-      ]
-    ]
+    mknodes [ [FOOS], [FOOS] ]
 
     txn1 = transaction do
       at(:foos).insert id: 1, name: "a"
