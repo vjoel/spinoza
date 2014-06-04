@@ -1,13 +1,40 @@
 spinoza
 =======
 
-A model of the Calvin distributed database.
+A model of the Calvin distributed database. The main purpose of this model is expository, rather than analysis for correctness or performance.
 
 Spinoza, like Calvin, was a philosopher who dealt in determinism.
 
+Calvin is developed by the Yale Databases group; the open-source releases are at https://github.com/yaledb.
+
+
+Structure
+=========
+
 The model of the underlying computer and network system is in [lib/spinoza/system](lib/spinoza/system).
 
-Calvin is developed by the Yale Databases group; the open-source releases are at https://github.com/yaledb.
+The Calvin model, implemented on the system models, is in [lib/spinoza/calvin](lib/spinoza/calvin). Other distributed transaction models could also be implemented on this layer.
+
+The transaction class, in [lib/spinoza/transaction.rb](lib/spinoza/transaction.rb), is mostly abstracted from these layers. It is very simplistic, intended to illustrate Calvin's replication and consistency characteristics.
+
+
+Running
+=======
+
+You will need ruby 2.0 or later, from http://ruby-lang.org, and the gems listed in the gemspec: 
+
+    sequel
+    sqlite3
+    rbtree
+
+You can also `gem install spinoza`, but it may not be up to date.
+
+To run the unit tests:
+
+    rake test
+
+Examples TBD.
+
 
 References
 ==========
