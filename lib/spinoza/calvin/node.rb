@@ -1,6 +1,6 @@
 require 'spinoza/system/node'
 require 'spinoza/calvin/sequencer'
-#require 'spinoza/calvin/scheduler'
+require 'spinoza/calvin/scheduler'
 
 class Calvin::Node < Spinoza::Node
   attr_reader :sequencer, :scheduler
@@ -10,8 +10,8 @@ class Calvin::Node < Spinoza::Node
       sequencer: nil, scheduler: nil, **rest
     super *tables, **rest
 
-    @sequencer ||= Calvin::Sequencer.new(node: self)
-#    @scheduler ||= Calvin::Scheduler.new(node: self)
+    @sequencer = sequencer || Calvin::Sequencer.new(node: self)
+    @scheduler = scheduler || Calvin::Scheduler.new(node: self)
     @log = log
     @meta_log = meta_log
   end
@@ -24,7 +24,8 @@ class Calvin::Node < Spinoza::Node
     log.read batch_id, node: self
   end
   
-  def finished_transaction result
+  def finished_transaction transaction, result
     ### pass result back to client
+    puts "[RESULT] #{transaction} => #{result}"
   end
 end
