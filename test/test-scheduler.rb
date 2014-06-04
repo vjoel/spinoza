@@ -5,6 +5,14 @@ require 'spinoza/system/log'
 require 'spinoza/system/meta-log'
 require 'spinoza/calvin/node'
 
+#===========#
+# DEBUGGING #
+#===========#
+#
+# require 'pp'
+# pp @results
+# pp @timeline.history.select {|time, event| event.action != :step_epoch}
+
 class TestScheduler < Minitest::Test
   include Spinoza
   
@@ -21,9 +29,10 @@ class TestScheduler < Minitest::Test
 
   # spec is an array of arrays of Tables, such as [ [FOOS], [FOOS, BARS] ]
   def mknodes spec
-    @nodes = spec.map do |tables|
+    @nodes = spec.map.with_index do |tables, i|
       Calvin::Node[
         *tables,
+        name: i,
         timeline: @timeline,
         log: @log,
         meta_log: @meta_log,
@@ -111,8 +120,8 @@ class TestScheduler < Minitest::Test
 
     @timeline.evolve 1.0
     
-    @results.each_with_index do |(node, rs), i|
-      desc = "node #{i}"
+    @results.each do |node, rs|
+      desc = node.inspect
       assert_equal [0.81, 0.81, 0.81], rs.map{|r| r[:time]}, desc
     
       assert_empty rs[0][:values], desc
@@ -120,5 +129,35 @@ class TestScheduler < Minitest::Test
       assert_equal [{id: 1, name: "a"}, nil, {id: 3, name: "cc"}],
         rs[2][:values], desc
     end
+  end
+
+  def test_remote_reads
+    mknodes [ [FOOS], [BARS] ]
+
+    @nodes[0].link @nodes[1], latency: 0.010
+
+    txn1 = transaction do
+      at(:foos).insert id: 1, name: "a"
+      at(:bars).insert id: 2, name: "b"
+    end
+
+    txn2 = transaction do
+      at(:foos, id: 1).read
+      at(:bars, id: 2).update name: "bb"
+        # write must be present or else msg to inactive node is optimized away
+    end
+
+    @nodes[0].sequencer.accept_transaction txn1
+    @nodes[0].sequencer.accept_transaction txn2
+
+    @timeline.evolve 2.0
+
+    rs = @results[@nodes[1]]
+
+    assert_equal 0.81, rs[0][:time]
+    assert_empty rs[0][:values]
+
+    assert_equal 0.81 + 0.010, rs[1][:time]
+    assert_equal [{id: 1, name: "a"}], rs[1][:values]
   end
 end
