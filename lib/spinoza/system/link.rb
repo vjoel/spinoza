@@ -19,6 +19,10 @@ class Spinoza::Link < Spinoza::Model
   class << self
     alias [] new
   end
+
+  def inspect
+    "<#{self.class}: #{src} -> #{dst}>"
+  end
   
   # The src node calls this to send a message. The message is scheduled for
   # arrival at the destination.

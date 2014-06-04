@@ -10,6 +10,10 @@ class Calvin::Readcaster
     @tables = node.tables
   end
   
+  def inspect
+    "<#{self.class} on #{node.inspect}>"
+  end
+
   # Pre-computed map, by table, of which nodes might need data from this node:
   # {table => Set[link, ...]} In other, words, excludes `table,link` pairs for
   # which link.dst already has `table`.

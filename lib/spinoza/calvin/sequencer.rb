@@ -31,6 +31,10 @@ class Calvin::Sequencer < Spinoza::Model
     step_epoch
   end
   
+  def inspect
+    "<#{self.class} on #{node.inspect}>"
+  end
+
   def step_epoch
     unless @batch.empty?
       batch_id = [@id, @epoch] # globally unique, but not ordered

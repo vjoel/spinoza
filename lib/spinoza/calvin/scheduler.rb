@@ -29,6 +29,10 @@ class Calvin::Scheduler
     node.meta_log.on_entry_available self, :handle_meta_log_entry
   end
 
+  def inspect
+    "<#{self.class} on #{node.inspect}>"
+  end
+
   def handle_meta_log_entry id: raise, node: raise, value: raise
     batch_id = value
     batch = node.read_batch(batch_id)
