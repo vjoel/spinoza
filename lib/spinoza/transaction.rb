@@ -19,8 +19,6 @@ require 'set'
 # replicas.
 #
 module Spinoza; class Transaction
-  attr_reader :ops
-
   class RowLocation
     def initialize txn, table, key
       @txn, @table, @key = txn, table, key
@@ -30,19 +28,19 @@ module Spinoza; class Transaction
       if @key and not @key.empty?
         raise ArgumentError, "Do not specify key in `at(...).insert(...)`."
       end
-      @txn.ops << InsertOperation.new(@txn, table: @table, row: row)
+      @txn << InsertOperation.new(@txn, table: @table, row: row)
     end
 
     def update row
-      @txn.ops << UpdateOperation.new(@txn, table: @table, row: row, key: @key)
+      @txn << UpdateOperation.new(@txn, table: @table, row: row, key: @key)
     end
 
     def delete
-      @txn.ops << DeleteOperation.new(@txn, table: @table, key: @key)
+      @txn << DeleteOperation.new(@txn, table: @table, key: @key)
     end
 
     def read
-      @txn.ops << ReadOperation.new(@txn, table: @table, key: @key)
+      @txn << ReadOperation.new(@txn, table: @table, key: @key)
     end
   end
 
@@ -57,24 +55,82 @@ module Spinoza; class Transaction
   #
   # node.store.execute txn # ==> [ReadResult(...)]
   #
+  # If the block takes an argument, then the Transaction instance is passed,
+  # and the block is not instance_eval-ed.
+  #
+  # If you create a transaction without using the block interface, you
+  # must call #closed! before using the transaction.
+  #
   def initialize &block
     @ops = []
+    @closed = false
+    @read_set = Hash.new {|h,k| h[k] = Set[]}
+    @write_set = Hash.new {|h,k| h[k] = Set[]}
+
     if block
       if block.arity == 0
         instance_eval &block
       else
         yield self
       end
+      closed!
+    end
+  end
+  
+  class StateError < StandardError; end
+
+  def closed?
+    @closed
+  end
+  
+  def closed!
+    assert_open!
+    @closed = true
+  end
+
+  def assert_closed!
+    unless closed?
+      raise StateError, "transaction must be closed to call that method."
+    end
+  end
+  
+  def assert_open!
+    if closed?
+      raise StateError, "transaction must be open to call that method."
     end
   end
   
   def at table, **key
     RowLocation.new(self, table, key)
   end
+
+  INSERT_KEY = :insert
+
+  def << op
+    assert_open!
+
+    case op
+    when ReadOperation
+      if reads_a_write?(op)
+        warn "reading your writes in a transaction may not be supported #{op}"
+      end
+      @read_set[op.table] << op.key
+    when InsertOperation
+      @write_set[op.table] << INSERT_KEY
+    else
+      @write_set[op.table] << op.key
+    end
+    @ops << op
+  end
   
+  def reads_a_write? op
+    @write_set[op.table].include? op.key
+  end
+
   # {table => Set[key, ...]}
   def read_set
-    @read_set || (scan_read_and_write_sets; @read_set)
+    assert_closed!
+    @read_set
   end
   
   # Set[table, table, ...]
@@ -82,12 +138,11 @@ module Spinoza; class Transaction
     @read_tables ||= Set[*read_set.keys]
   end
   
-  INSERT_KEY = :insert
-
   # {table => Set[key|INSERT_KEY, ...]}
   # where existence of INSERT_KEY means presence of inserts in txn
   def write_set
-    @write_set || (scan_read_and_write_sets; @write_set)
+    assert_closed!
+    @write_set
   end
 
   # Set[table, table, ...]
@@ -95,30 +150,19 @@ module Spinoza; class Transaction
     @write_tables ||= Set[*write_set.keys]
   end
   
-  def scan_read_and_write_sets
-    unless @read_set and @write_set
-      @read_set = Hash.new {|h,k| h[k] = Set[]}
-      @write_set = Hash.new {|h,k| h[k] = Set[]}
-
-      ops.each do |op|
-        case op
-        when ReadOperation
-          @read_set[op.table] << op.key
-        when InsertOperation
-          @write_set[op.table] << INSERT_KEY
-        else
-          @write_set[op.table] << op.key
-        end
-      end
-    end
-  end
-
   def all_read_ops
-    @all_read_ops ||= ops.grep(ReadOperation)
+    assert_closed!
+    @all_read_ops ||= @ops.grep(ReadOperation)
   end
 
   def all_write_ops
-    @all_write_ops ||= ops - all_read_ops
+    assert_closed!
+    @all_write_ops ||= @ops - all_read_ops
+  end
+
+  def ops
+    assert_closed!
+    @ops
   end
 
   # returns true iff node_or_store contains elements of write set
