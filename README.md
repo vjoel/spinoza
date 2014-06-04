@@ -5,7 +5,7 @@ A model of the Calvin distributed database.
 
 Spinoza, like Calvin, was a philosopher who dealt in determinism.
 
-The model of the underlying computer and network system is in lib/spinoza/system.
+The model of the underlying computer and network system is in [lib/spinoza/system](lib/spinoza/system).
 
 Calvin is developed by the Yale Databases group; the open-source releases are at https://github.com/yaledb.
 
@@ -30,7 +30,7 @@ To do
 
 * The performance and error modeling should optionally be statistical, with variation using some distribution.
 
-* Model IO latency and compute time.
+* Model IO latency and compute time, in addition to currently modeled network latency.
 
 * `Log#time_replicated` should be a function of the reading node and depend on the link characteristics between that node and the writing node.
 
