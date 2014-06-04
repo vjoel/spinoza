@@ -72,31 +72,7 @@ class Calvin::Scheduler
     txn = work_queue.first
     raise if ex_for_txn[txn]
 
-    lm = node.lock_manager
-    rset = txn.read_set
-    wset = txn.write_set
-    
-    lock_succeeded =
-      begin
-        # get write locks first, so r/w on same key doesn't fail
-        wset.each do |table, keys|
-          keys.each do |key|
-            next if key == Transaction::INSERT_KEY
-            lock_write [table, key], txn
-          end
-        end
-
-        rset.each do |table, keys|
-          keys.each do |key|
-            lock_read [table, key], txn
-          end
-        end
-
-        true
-
-      rescue Spinoza::LockManager::ConcurrencyError
-        false
-      end
+    lock_succeeded = try_lock(txn)
     
     if lock_succeeded
       txn = work_queue.shift
@@ -109,13 +85,38 @@ class Calvin::Scheduler
       end
 
     else
-      lm.unlock_all transaction
+      node.lock_manager.unlock_all transaction
       # nothing to do until some executor finishes its current transaction
       ## TODO optimization: attempt to reorder another txn to the head
       ## of the work_queue where lock sets are disjoint.
     end
 
     lock_succeeded
+  end
+
+  def try_lock txn
+    lm = node.lock_manager
+    rset = txn.read_set
+    wset = txn.write_set
+
+    # get write locks first, so r/w on same key doesn't fail
+    wset.each do |table, keys|
+      keys.each do |key|
+        next if key == Transaction::INSERT_KEY
+        lock_write [table, key], txn
+      end
+    end
+
+    rset.each do |table, keys|
+      keys.each do |key|
+        lock_read [table, key], txn
+      end
+    end
+
+    true
+
+  rescue Spinoza::LockManager::ConcurrencyError
+    false
   end
 
   def finish_transaction transaction, result
