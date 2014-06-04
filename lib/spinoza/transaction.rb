@@ -19,6 +19,10 @@ require 'set'
 # replicas.
 #
 module Spinoza
+  def transaction(&b)
+    Transaction.new(&b)
+  end
+
   class Transaction
     class RowLocation
       def initialize txn, table, key
