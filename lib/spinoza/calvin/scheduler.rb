@@ -102,14 +102,14 @@ class Calvin::Scheduler
     # get write locks first, so r/w on same key doesn't fail
     wset.each do |table, keys|
       keys.each do |key|
-        next if key == Transaction::INSERT_KEY
-        lock_write [table, key], txn
+        next if key == Spinoza::Transaction::INSERT_KEY
+        lm.lock_write [table, key], txn
       end
     end
 
     rset.each do |table, keys|
       keys.each do |key|
-        lock_read [table, key], txn
+        lm.lock_read [table, key], txn
       end
     end
 
