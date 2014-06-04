@@ -14,6 +14,13 @@ class Calvin::Node < Spinoza::Node
     @meta_log = meta_log
     @sequencer = sequencer || Calvin::Sequencer.new(node: self)
     @scheduler = scheduler || Calvin::Scheduler.new(node: self)
+
+    on_transaction_finish &method(:default_output)
+  end
+
+  def default_output transaction, result
+    r = result.map {|rr| [rr.op.table, rr.val].join(":")}.join(", ")
+    puts "%07.6f [RESULT] #{transaction} => #{r}" % timeline.now
   end
 
   def recv **opts
@@ -24,8 +31,14 @@ class Calvin::Node < Spinoza::Node
     log.read batch_id, node: self
   end
   
+  def on_transaction_finish &b
+    @finished_transaction_handler = b
+  end
+
+  # Override this to put the result somewhere.
   def finished_transaction transaction, result
-    ### pass result back to client
-    puts "[RESULT] #{transaction} => #{result}"
+    if @finished_transaction_handler
+      @finished_transaction_handler[transaction, result]
+    end
   end
 end
