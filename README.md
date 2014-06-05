@@ -40,7 +40,7 @@ Observing
 
 One benefit of modeling concurrency in a single thread is being able to see what is going on at every node at every moment in time. In fact, Spinoza keeps a history of all "events". (Events are how we model the passage of time and the actions that occur at a point in time.) As noted in [test/test-scheduler.rb](test/test-scheduler.rb), you can use this to make assertions about what occurred, when, and where:
 
-  pp @timeline.history.select {|time, event| event.action != :step_epoch}
+    pp @timeline.history.select {|time, event| event.action != :step_epoch}
 
 (The :step_epoch events are frequent and not usually very interesting.) The hostory is stored in a red-black tree for easy access by time interval.
 
