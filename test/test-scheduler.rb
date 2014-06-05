@@ -143,6 +143,7 @@ class TestScheduler < Minitest::Test
 
     txn2 = transaction do
       at(:foos, id: 1).read
+        ### TODO use logic or other ops here to make update depend on read
       at(:bars, id: 2).update name: "bb"
         # write must be present or else msg to inactive node is optimized away
     end
@@ -160,4 +161,8 @@ class TestScheduler < Minitest::Test
     assert_equal 0.81 + 0.010, rs[1][:time]
     assert_equal [{id: 1, name: "a"}], rs[1][:values]
   end
+
+  ### TODO
+  ### always assert that results on all nodes are same (if links exist)
+  ### test with nontrivial locking, nontrivial Executor concurrency
 end
