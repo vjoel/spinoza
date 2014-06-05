@@ -10,7 +10,7 @@ class Calvin::Scheduler
 
   # Maps { locally executing transaction => Executor }
   attr_reader :ex_for_txn
-  
+
   # Transactions to be executed, in order.
   attr_reader :work_queue
 
@@ -25,7 +25,7 @@ class Calvin::Scheduler
     @idle_executors = @executors.dup
     @ex_for_txn = {}
     @work_queue = []
-    
+
     node.meta_log.on_entry_available self, :handle_meta_log_entry
   end
 
@@ -70,14 +70,14 @@ class Calvin::Scheduler
       break unless success
     end
   end
-  
+
   def handle_next_transaction
     ex = idle_executors.last
     txn = work_queue.first
     raise if ex_for_txn[txn]
 
     lock_succeeded = try_lock(txn)
-    
+
     if lock_succeeded
       txn = work_queue.shift
       result = ex.execute_transaction(txn)
@@ -100,7 +100,7 @@ class Calvin::Scheduler
 
   def try_lock txn
     lm = node.lock_manager
-    rset = txn.read_set
+    rset = txn.read_set # TODO restrict this to local tables
     wset = txn.write_set
 
     # get write locks first, so r/w on same key doesn't fail
