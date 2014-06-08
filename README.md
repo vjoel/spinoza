@@ -60,6 +60,9 @@ References
 
   * [Lightweight Locking for Main Memory Database Systems](http://cs-www.cs.yale.edu/homes/dna/papers/vll-vldb13.pdf)
 
+* A presentation on Calvin:
+
+  * https://speakerdeck.com/paperswelove/pwlsf-number-4-equals-joel-vanderwerf-on-calvin
 
 To do
 =====
