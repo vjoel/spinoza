@@ -4,6 +4,10 @@ require 'spinoza/common'
 # Events are the way we model the passage of time in a concurrent system. An
 # event action initiates some action at some time. The action happens
 # instantaneously on the timeline, except by scheduling later events.
+# event is to schedule something like a transaction
+# what is actor? - person who initiated an event
+# what is action?
+
 class Spinoza::Event
   attr_reader :time, :actor, :action, :data
 
@@ -13,6 +17,8 @@ class Spinoza::Event
     @time, @actor, @action, @data = time, actor, action, data
   end
   
+  # e.g. sending some information from one node to another
+  # e.g. executing an event 
   def dispatch
     if data.empty?
       actor.send action
@@ -34,6 +40,7 @@ class Spinoza::Timeline
     @now = 0.0
   end
   
+  # schedule an event in the future RBTree data structure
   def schedule event
     @future[event.time] = event
   end
@@ -69,6 +76,7 @@ class Spinoza::Timeline
     @now = t_end
   end
 
+  # dispatch an event, after checking the time
   private def dispatch_event event
     if event.time < now
       raise Error, "Event scheduled in the past: #{event}"
